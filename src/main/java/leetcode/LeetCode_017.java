@@ -15,14 +15,47 @@ import java.util.List;
 
 public class LeetCode_017 {
 
+    private static final char[][] WORDS = new char[][]{{'a', 'b', 'c'},
+            {'d', 'e', 'f'},
+            {'g', 'h', 'i'},
+            {'j', 'k', 'l'},
+            {'m', 'n', 'o'},
+            {'p', 'q', 'r', 's'},
+            {'t', 'u', 'v'},
+            {'w', 'x', 'y', 'z'}
+    };
+    private static List<String> result;
+
     public static void main(String[] args) {
-
+        String digits = "23";
+        List<String> list = letterCombinations(digits);
+        for (String s : list) {
+            System.out.println(s);
+        }
     }
 
-    public List<String> letterCombinations(String digits) {
-        List<String> list = new ArrayList<>();
-
-
-        return list;
+    public static List<String> letterCombinations(String digits) {
+        result = new ArrayList<>();
+        if (digits.length() == 0) {
+            return result;
+        }
+        char[] cur = new char[digits.length()];
+        letterCombinationsProcess(digits.toCharArray(), 0, cur, 0);
+        return result;
     }
+
+    private static void letterCombinationsProcess(char[] chars, int index, char[] cur, int curIndex) {
+        if (curIndex >= cur.length) {
+            result.add(new String(cur, 0, curIndex));
+            return;
+        }
+
+        char[] word = WORDS[chars[index] - '2'];
+        for (char c : word) {
+            cur[curIndex++] = c;
+            letterCombinationsProcess(chars, index + 1, cur, curIndex);
+            --curIndex;
+        }
+    }
+
 }

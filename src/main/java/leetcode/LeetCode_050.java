@@ -7,29 +7,35 @@ package leetcode;
  * @version: 1.0
  */
 
-public class LeetCode_50 {
+public class LeetCode_050 {
+    private static int size = 0;
 
     public static void main(String[] args) {
-
+        double x = 2.00000;
+        int n = 10;
         double v = myPow(0.000001, Integer.MAX_VALUE);
+//        double v = myPow(x, n);
 
         System.out.println(v);
+        System.out.println(size);
+        size = 0;
+        for (int i = 0; i < 31; i++) {
+            size += i;
+        }
+        System.out.println(size);
     }
+
 
     public static double myPow(double x, int n) {
 
         if (n == 0 || x == 1) {
-
             return 1;
         }
 
         if (x == -1) {
-
             if ((n & 1) == 1) {
-
                 return -1;
             } else {
-
                 return 1;
             }
         }
@@ -43,42 +49,26 @@ public class LeetCode_50 {
 
         int index = 1, cur = Math.abs(n);
 
-
         while (cur >= 1) {
-//            System.out.println(cur);
-
-
             curResult = x;
 
-
             index = 1;
-            while (index * 2 < cur && index * 2 > 0) {
-
-//                System.out.println(cur);
-                index *= 2;
-
+            while ((index << 1) < cur && (index << 1) > 0) {
+                index <<= 1;
                 curResult *= curResult;
             }
             cur -= index;
 
             result *= curResult;
+//            if (result == 0) {
+//                return 0D;
+//            } else if (result == 1 || result == -1) {
+//                return (cur & 1) == 1 ? result : 1;
+//            }
         }
 
 
-//        for (int i = index; i < Math.abs(n); i++) {
-//
-//            result *= x;
-//        }
-
-//        System.out.println(result);
-
-//        if ((n & 1) == 1) {
-//
-//            result *= x;
-//        }
-
         if (n < 0) {
-
             result = 1 / result;
         }
 

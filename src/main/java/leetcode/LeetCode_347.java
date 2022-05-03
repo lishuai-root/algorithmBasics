@@ -1,9 +1,6 @@
 package leetcode;
 
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.PriorityQueue;
+import java.util.*;
 
 /**
  * @description: Given an integer array nums and an integer k, return the k most frequent elements.
@@ -30,60 +27,27 @@ public class LeetCode_347 {
     public static int[] topKFrequent(int[] nums, int k) {
 
         int[] result = new int[k];
-
-        int index = -1;
-
         Map<Integer, Integer> map = new HashMap<>();
+        Queue<Integer> queue = new PriorityQueue<>((a, b) -> {
+            return map.get(a) - map.get(b);
+        });
 
         for (int i : nums) {
-
             map.put(i, map.getOrDefault(i, 0) + 1);
         }
-
-        for (Integer i : map.keySet()) {
-
-            if (index != k - 1) {
-
-                result[++index] = i;
-
-                int cur = index;
-
-                while (index > 0 && map.get(result[index]) > map.get(result[index - 1])) {
-
-                    int r = result[index];
-
-                    result[index] = result[index - 1];
-
-                    result[index - 1] = r;
-
-                    index--;
-                }
-
-                index = cur;
-
-                continue;
+        for (int i : map.keySet()) {
+            if (queue.size() < k) {
+                queue.add(i);
+            } else if (map.get(queue.peek()) < map.get(i)) {
+                queue.poll();
+                queue.add(i);
             }
 
-            if (map.get(i) > map.get(result[index])) {
-
-                result[index] = i;
-
-                while (index > 0 && map.get(result[index]) > map.get(result[index - 1])) {
-
-                    int r = result[index];
-
-                    result[index] = result[index - 1];
-
-                    result[index - 1] = r;
-
-                    index--;
-                }
-
-                index = k - 1;
-            }
         }
-
-
+        int i = 0;
+        while (!queue.isEmpty()) {
+            result[i++] = queue.poll();
+        }
         return result;
     }
 

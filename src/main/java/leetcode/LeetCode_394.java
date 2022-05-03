@@ -18,86 +18,68 @@ public class LeetCode_394 {
 
     public static void main(String[] args) {
 
-        String s = "abc3[cd]xyz";
+//        String s = "abc3[cd]xyz";
+//        String s = "3[a2[c]]";
+//        String s = "2[abc]3[cd]ef2[abc]3[cd]ef2[abc]3[cd]ef2[abc]3[cd]ef2[abc]3[cd]ef";
+        String s = "3[2[2[2[2[a]]]]]";
+//        String s = "3[a]2[bc]";
 
         String s1 = decodeString(s);
 
         System.out.println(s1);
+        System.out.println(s1.length());
+
+        StringBuilder ss1 = new StringBuilder();
+        StringBuilder ss2 = new StringBuilder();
+
+        ss1.append("[".repeat(10000));
+        ss2.append("[".repeat(10000));
+        String str = ss1 + "a" + ss2;
+        String s2 = decodeString(str);
+        System.out.println(s2);
+
     }
 
     public static String decodeString(String s) {
 
-        int index = 0;
-
-        for (int i = 0; i < s.length(); i++) {
-
-            if (s.charAt(i) >= 0 && s.charAt(i) <= 9) {
-
-                index++;
-            }
-        }
-
-        if (index > 0) {
-
-            index = Integer.parseInt(s.substring(0, index));
-        }
-
-        return process(s, index);
+        return decodeStringProcess(s);
     }
 
-    public static String process(String s, int size) {
-        int right, i = 1, childRight = 0, c = 0, f = 0;
+    private static String decodeStringProcess(String s) {
+        char[] chars = s.toCharArray();
+        Info info = decodeStringProcess(chars, 0);
+        return info.value;
+    }
 
-        int left = s.indexOf('[');
+    private static Info decodeStringProcess(char[] chars, int start) {
+        int size = 0;
+        StringBuilder sbr = new StringBuilder();
 
-        right = s.lastIndexOf(']');
-
-        int childLeft = s.indexOf(left + 1, '[');
-
-        String p = "";
-
-        if (childLeft != -1) {
-
-            childRight = s.indexOf(']', right);
-
-            i = childLeft - 1;
-
-            while (i >= 0 && s.charAt(i) >= 0 && s.charAt(i) <= 9) {
-
-                c++;
-
-                i--;
+        while (start < chars.length) {
+            if (chars[start] >= 'a' && chars[start] <= 'z') {
+                sbr.append(chars[start]);
+            } else if (chars[start] >= '0' && chars[start] <= '9') {
+                size = size * 10 + (chars[start] - '0');
+            } else if (chars[start] == '[') {
+                Info info = decodeStringProcess(chars, start + 1);
+                sbr.append(info.value.repeat(Math.max(size, 1)));
+                start = info.index;
+                size = 0;
+            } else {
+                break;
             }
-
-            if (i + 1 < childLeft) {
-
-                i = Integer.parseInt(s.substring(i + 1, childLeft));
-            }
-
-            p = process(s.substring(childLeft + 1, childRight), i);
+            start++;
         }
+        return new Info(sbr.toString(), start);
+    }
 
-        i = left - 1;
+    static class Info {
+        String value;
+        int index;
 
-        while (i >= 0 && s.charAt(i) >= 0 && s.charAt(i) <= 9) {
-
-            f++;
-
-            i--;
+        public Info(String value, int index) {
+            this.value = value;
+            this.index = index;
         }
-
-        i = i + 1 < left ? Integer.parseInt(s.substring(i + 1, left)) : 1;
-
-        StringBuilder sb = new StringBuilder();
-
-        for (int j = 0; j < i; j++) {
-
-            sb.append(s.substring(0, left - f))
-                    .append(s.substring(left + 1, childLeft - c))
-                    .append(p)
-                    .append(s.substring(right + 1, s.length()));
-        }
-
-        return sb.toString();
     }
 }

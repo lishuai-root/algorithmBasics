@@ -45,6 +45,7 @@ public class LeetCode_1962 {
         int ans = 0;
 
         Queue<Integer> queue = new PriorityQueue<Integer>(piles.length, Collections.reverseOrder());
+
         for (int i : piles) {
             ans += i;
             queue.offer(i);

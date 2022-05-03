@@ -1,6 +1,5 @@
 package leetcode;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -13,13 +12,17 @@ import java.util.List;
 
 public class LeetCode_230 {
 
+    private static int size;
+
     public static int kthSmallest(TreeNode root, int k) {
 
-        List<Integer> list = new ArrayList<>();
-
-        process(root, list);
-
-        return list.get(k - 1);
+//        List<Integer> list = new ArrayList<>();
+//
+//        process(root, list);
+//
+//        return list.get(k - 1);
+        size = k;
+        return process(root).val;
     }
 
     private static void process(TreeNode root, List<Integer> list) {
@@ -34,6 +37,22 @@ public class LeetCode_230 {
         list.add(root.val);
 
         process(root.right, list);
+    }
+
+    private static TreeNode process(TreeNode root) {
+        if (root == null) {
+            return null;
+        }
+
+        TreeNode node = process(root.left);
+        if (size == 0) {
+            return node;
+        }
+
+        if (--size == 0) {
+            return root;
+        }
+        return process(root.right);
     }
 
     public static class TreeNode {

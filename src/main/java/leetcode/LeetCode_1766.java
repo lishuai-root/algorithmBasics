@@ -1,6 +1,7 @@
 package leetcode;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @description: There is a tree (i.e., a connected,
@@ -31,9 +32,7 @@ import java.util.*;
 
 public class LeetCode_1766 {
 
-    private static int[] ans;
-
-    private static int r;
+    private static List<List<Integer>> cache;
 
     public static void main(String[] args) {
 
@@ -49,96 +48,82 @@ public class LeetCode_1766 {
 
             System.out.print(i + " ");
         }
+        System.out.println();
+        System.out.println(gcd(3, 3));
     }
 
     public static int[] getCoprimes(int[] nums, int[][] edges) {
-        r = 0;
+        List<List<Integer>> graph = getGraph(edges, nums, nums.length);
+        cache = new ArrayList<>(nums.length);
+        int[] ans = new int[nums.length];
         for (int i = 0; i < nums.length; i++) {
-
-            r ^= i;
+            cache.add(new ArrayList<>());
         }
-        Map<Integer, List<Integer>> edgesMap = getEdges(edges);
-
-        PriorityQueue<Integer> queue = new PriorityQueue<>();
-        for (int i : edgesMap.keySet()) {
-
-            queue.addAll(edgesMap.get(i));
+        for (int i = 0; i < nums.length; i++) {
+//            List<Integer> list = getCoprimesProcess(i, graph);
+//            int m = -1;
+//            for (int j : list) {
+//                if (gcd(nums[i], nums[j]) == 1) {
+//                    m = j;
+//                    break;
+//                }
+//            }
+//            ans[i] = m;
+            if (gcd(nums[i], nums[graph.get(i).get(0)]) == 1) {
+                ans[i] = graph.get(i).get(0);
+            } else {
+                ans[i] = -1;
+            }
         }
-
-        while (!queue.isEmpty()) {
-
-            System.out.print(queue.poll() + " ");
-        }
-
-        System.out.println();
-
-        ans = new int[nums.length];
-
-//        ans[0] = -1;
-
-        List<Integer> list = new ArrayList<>();
-
-//        list.add(0);
-
-        boolean[] bl = new boolean[nums.length];
-
-        process(edgesMap, list, nums, r, bl);
-
         return ans;
     }
 
+    private static List<Integer> getCoprimesProcess(int node, List<List<Integer>> graph) {
+        if (!cache.get(node).isEmpty()) {
+            return cache.get(node);
+        }
 
-    private static void process(Map<Integer, List<Integer>> map, List<Integer> list, int[] nums, int root, boolean[] bl) {
+        List<Integer> list = new ArrayList<>();
+        for (int i : graph.get(node)) {
+            list.add(i);
+            list.addAll(getCoprimesProcess(i, graph));
+        }
+        return list;
+    }
 
-        int n = -1;
+    private static List<List<Integer>> getGraph(int[][] edges, int[] nums, int n) {
+        List<List<Integer>> graph = new ArrayList<>(n);
+        for (int i = 0; i < n; i++) {
+            ArrayList<Integer> l = new ArrayList<>();
+//            l.add(Integer.MAX_VALUE);
+            graph.add(l);
+        }
 
-        for (int i = list.size() - 1; i >= 0; i--) {
+        for (int[] ints : edges) {
 
-            int j = gcd(nums[root], nums[list.get(i)]);
-
-            if (j == 1) {
-
-                n = i;
-                break;
+            if (graph.get(ints[1]).isEmpty()) {
+                graph.get(ints[1]).add(ints[0]);
+            } else {
+                if (nums[graph.get(ints[1]).get(0)] > nums[ints[0]]) {
+                    graph.get(ints[1]).add(0, ints[0]);
+                }
             }
+
+            if (graph.get(ints[0]).isEmpty()) {
+                graph.get(ints[0]).add(ints[1]);
+            } else {
+                if (nums[graph.get(ints[0]).get(0)] > nums[ints[1]]) {
+                    graph.get(ints[0]).add(0, ints[1]);
+                }
+            }
+
+
+//            graph.get(ints[1]).add(0, Math.min(graph.get(ints[1]).get(0), ints[0]));
+//            graph.get(ints[0]).add(0, Math.min(graph.get(ints[0]).get(0), ints[1]));
+//            graph.get(ints[1]).add(ints[0]);
         }
-
-        ans[root] = n;
-
-        if (!map.containsKey(root) || bl[root]) {
-
-            return;
-        }
-
-        list.add(root);
-
-        List<Integer> l = map.get(root);
-
-        bl[root] = true;
-
-        for (Integer integer : l) {
-
-            process(map, list, nums, integer, bl);
-        }
-
-        bl[root] = false;
-        list.remove(list.size() - 1);
+        return graph;
     }
-
-    private static Map<Integer, List<Integer>> getEdges(int[][] edges) {
-
-        Map<Integer, List<Integer>> map = new HashMap<>();
-
-        for (int[] arr : edges) {
-
-            r ^= arr[1];
-
-            map.computeIfAbsent(arr[0], o -> new ArrayList<>()).add(arr[1]);
-        }
-
-        return map;
-    }
-
 
     public static int gcd(int a, int b) {
         return b == 0 ? a : gcd(b, a % b);
