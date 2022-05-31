@@ -89,11 +89,15 @@ public class LeetCode_1887 {
         Arrays.sort(nums);
         int left = 0, ans = 0;
 
-        while (++left < nums.length && nums[left] == nums[left - 1]) ;
+        while (++left < nums.length && nums[left] == nums[left - 1]) {
+            ;
+        }
 
         while (left < nums.length) {
             ans += nums.length - left;
-            while (++left < nums.length && nums[left] == nums[left - 1]) ;
+            while (++left < nums.length && nums[left] == nums[left - 1]) {
+                ;
+            }
         }
 
         return ans;

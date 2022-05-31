@@ -1,7 +1,7 @@
 package leetcode;
 
 /**
- * @description:
+ * @description: Given a string containing just the characters '(' and ')', find the length of the longest valid (well-formed) parentheses substring.
  * @author: LISHUAI
  * @createDate: 2021/8/8 12:48
  * @version: 1.0

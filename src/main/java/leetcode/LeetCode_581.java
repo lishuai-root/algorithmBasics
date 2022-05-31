@@ -41,7 +41,9 @@ public class LeetCode_581 {
             max = Math.max(max, nums[index]);
             min = Math.min(min, nums[index]);
         }
-        while (--left >= 0 && nums[left] > min) ;
+        while (--left >= 0 && nums[left] > min) {
+            ;
+        }
 
         return right - left;
     }

@@ -61,7 +61,7 @@ public class LeetCode_449 {
     public static TreeNode deserialize(String data) {
         TreeNode root = null;
 
-        if (data == null || data.equals("N") || data.equals("")) {
+        if (data == null || "N".equals(data) || "".equals(data)) {
 
             return root;
         }
@@ -86,12 +86,12 @@ public class LeetCode_449 {
 
                 index++;
 
-                if (index * 2 + 1 < strs.length && !strs[index * 2 + 1].equals("N")) {
+                if (index * 2 + 1 < strs.length && !"N".equals(strs[index * 2 + 1])) {
 
                     node.left = new TreeNode(Integer.parseInt(strs[index * 2 + 1]));
                 }
 
-                if (index * 2 + 2 < strs.length && !strs[index * 2 + 2].equals("N")) {
+                if (index * 2 + 2 < strs.length && !"N".equals(strs[index * 2 + 2])) {
 
                     node.right = new TreeNode(Integer.parseInt(strs[index * 2 + 2]));
                 }

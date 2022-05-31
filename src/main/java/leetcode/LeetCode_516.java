@@ -9,6 +9,8 @@ package leetcode;
 
 public class LeetCode_516 {
 
+    private static Integer[][] cache;
+
     public static void main(String[] args) {
 
         String str = "cbbd";
@@ -18,14 +20,13 @@ public class LeetCode_516 {
 
         System.out.println(i);
         System.out.println(i1);
-
     }
 
     private static int fn_001(String s) {
 
         if (s == null || s.length() < 1)
             return 0;
-
+        cache = new Integer[s.length()][s.length()];
         return process(s, 0, s.length() - 1);
     }
 
@@ -36,53 +37,84 @@ public class LeetCode_516 {
         if (left > right || right < left)
             return 0;
 
+        if (cache[left][right] != null) {
+            return cache[left][right];
+        }
+        int ans;
         if (str.charAt(left) == str.charAt(right)) {
-            return 2 + process(str, left + 1, right - 1);
+            ans = 2 + process(str, left + 1, right - 1);
         } else {
-            return Math.max(process(str, left + 1, right), process(str, left, right - 1));
+            ans = Math.max(process(str, left + 1, right), process(str, left, right - 1));
         }
 
+        cache[left][right] = ans;
+        return ans;
     }
 
     private static int process_002(String s) {
 
         if (s == null || s.length() < 1)
             return 0;
-
         int len = s.length();
-
-        int[][] arr = new int[len][len];
-
+        int[][] dp = new int[len][len];
         for (int i = 0; i < len; i++) {
-
-            arr[i][i] = 1;
+            dp[i][i] = 1;
         }
 
         for (int i = 1; i < len; i++) {
-
             for (int j = 0, m = i; m < len; j++, m++) {
                 if (s.charAt(m) == s.charAt(j)) {
-
-                    arr[j][m] = 2 + arr[j + 1][m - 1];
+                    dp[j][m] = 2 + dp[j + 1][m - 1];
                 } else {
-
-                    arr[j][m] = Math.max(arr[j + 1][m], arr[j][m - 1]);
+                    dp[j][m] = Math.max(dp[j + 1][m], dp[j][m - 1]);
                 }
             }
-
-
         }
 
 //        for (int i = 0; i < len; i++) {
 //
 //            for (int j = 0; j < len; j++) {
 //
-//                System.out.print(arr[i][j] + "  ");
+//                System.out.print(dp[i][j] + "  ");
 //
 //            }
 //            System.out.println();
 //        }
 
-        return arr[0][len - 1];
+        return dp[0][len - 1];
+    }
+
+    private static int process_003(String s) {
+
+        if (s == null || s.length() < 1)
+            return 0;
+        int len = s.length();
+        int[][] dp = new int[len][len];
+        for (int i = 0; i < len; i++) {
+            dp[i][i] = 1;
+        }
+
+        for (int i = 1; i < len; i++) {
+
+            for (int j = i; j < len; j++) {
+                if (s.charAt(j) == s.charAt(j - i)) {
+                    dp[j - i][j] = 2 + dp[j - i + 1][j - 1];
+                } else {
+                    dp[j - i][j] = Math.max(dp[j - i + 1][j], dp[j - i][j - 1]);
+                }
+            }
+        }
+
+//        for (int i = 0; i < len; i++) {
+//
+//            for (int j = 0; j < len; j++) {
+//
+//                System.out.print(dp[i][j] + "  ");
+//
+//            }
+//            System.out.println();
+//        }
+
+        return dp[0][len - 1];
     }
 }

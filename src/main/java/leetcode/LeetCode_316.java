@@ -1,7 +1,5 @@
 package leetcode;
 
-import java.util.Arrays;
-
 /**
  * @description: Given a string s, remove duplicate letters so that every letter appears once and only once.
  * You must make sure your result is the smallest in lexicographical order among all possible results.
@@ -14,55 +12,33 @@ public class LeetCode_316 {
 
     public static void main(String[] args) {
         String s = "bcabc";
+//        String s = "abacb";
         String s1 = removeDuplicateLetters(s);
         System.out.println(s1);
     }
 
     public static String removeDuplicateLetters(String s) {
-        int[] ans = new int[26];
-        int[] max = new int[26];
+        int[] count = new int[26];
+        int[] exists = new int[26];
         char[] chars = s.toCharArray();
-        Arrays.fill(ans, -1);
-        for (int i = 0; i < chars.length; i++) {
-            max[chars[i] - 'a'] = i;
+        char[] stack = new char[26];
+        int index = -1;
+        for (char c : chars) {
+            count[c - 'a']++;
         }
-        for (int i = 0; i < s.length(); i++) {
-            if (ans[chars[i] - 'a'] == -1) {
-                ans[chars[i] - 'a'] = i;
+
+        for (char aChar : chars) {
+            count[aChar - 'a']--;
+            if (exists[aChar - 'a'] > 0) {
                 continue;
             }
-
-            int cc = chars[i] - 'a';
-            int c = ans[chars[i] - 'a'];
-            int p = c;
-            boolean b = true;
-//            while (++c < i && b) {
-////                if (chars[c] > chars[i] && max[c] < i) {
-////                    b = false;
-////                }
-//                if (chars[c] < chars[i]) {
-//                    b = false;
-//                }
-//            }
-//            if (chars[c] > chars[c + 1]) {
-//                ans[chars[i] - 'a'] = i;
-//            }
-            while (++cc < ans.length) {
-                if (ans[cc] == c + 1) {
-
-                }
+            while (index != -1 && aChar < stack[index] && count[stack[index] - 'a'] > 0) {
+                exists[stack[index--] - 'a']--;
             }
-//            if (b) {
-//                ans[chars[i] - 'a'] = i;
-//            }
+            stack[++index] = aChar;
+            exists[aChar - 'a']++;
+
         }
-        Arrays.sort(ans);
-        StringBuilder sbr = new StringBuilder();
-        for (int i : ans) {
-            if (i != -1) {
-                sbr.append(chars[i]);
-            }
-        }
-        return sbr.toString();
+        return String.valueOf(stack, 0, index + 1);
     }
 }

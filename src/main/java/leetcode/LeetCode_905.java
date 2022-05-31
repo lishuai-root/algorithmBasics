@@ -49,8 +49,12 @@ public class LeetCode_905 {
     public static int[] sortArrayByParity(int[] nums) {
         int i = -1, j = -1;
         while (i < nums.length) {
-            while (++i < nums.length && (nums[i] & 1) != 0) ;
-            while (++j < i && (nums[j] & 1) != 1) ;
+            while (++i < nums.length && (nums[i] & 1) != 0) {
+                ;
+            }
+            while (++j < i && (nums[j] & 1) != 1) {
+                ;
+            }
             if (i < nums.length && j < i) {
                 nums[i] = nums[j] ^ nums[i];
                 nums[j] = nums[j] ^ nums[i];

@@ -242,9 +242,13 @@ public class LeetCode_2132 {
 
         for (int i = 0; i < m; i++) {
             for (int j = 0; j < n; j++) {
-                if (new_grid[i][j] == 1) System.out.println(i + " " + j);
+                if (new_grid[i][j] == 1) {
+                    System.out.println(i + " " + j);
+                }
                 if (grid[i][j] == 1) {
-                    if (sum2(dp2, i, j, stampHeight, stampWidth) <= 0) return false;
+                    if (sum2(dp2, i, j, stampHeight, stampWidth) <= 0) {
+                        return false;
+                    }
                 }
             }
         }
@@ -255,7 +259,9 @@ public class LeetCode_2132 {
     public static int sum(int[][] dp, int r, int c, int stampHeight, int stampWidth) {
         int m = dp.length - 1;
         int n = dp[0].length - 1;
-        if (r + stampHeight - 1 >= m || c + stampWidth - 1 >= n) return 0;
+        if (r + stampHeight - 1 >= m || c + stampWidth - 1 >= n) {
+            return 0;
+        }
 
         int r2 = r + stampHeight - 1;
         int c2 = c + stampWidth - 1;

@@ -38,7 +38,7 @@ public class LeetCode_331 {
         if (index >= chars.length) {
             return index;
         }
-        if (chars[index].equals("#")) {
+        if ("#".equals(chars[index])) {
             return index;
         }
 

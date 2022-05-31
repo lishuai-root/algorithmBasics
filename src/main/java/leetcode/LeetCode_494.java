@@ -59,8 +59,9 @@ public class LeetCode_494 {
         for (int i = 0; i < n; i++) {
             total += nums[i];
         }
-        if ((total - target) % 2 == 1 || total < target)
+        if ((total - target) % 2 == 1 || total < target) {
             return 0;
+        }
         int sum = (total - target) / 2;
         int[] dp = new int[sum + 1];
         dp[0] = 1;

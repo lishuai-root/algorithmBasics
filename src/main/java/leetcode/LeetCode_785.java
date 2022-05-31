@@ -192,18 +192,26 @@ public class LeetCode_785 {
             boolean[] set2 = new boolean[len];
 
             for (int i = 0; i < len; ++i) {
-                if (set1[i] || set2[i]) continue;
-                if (!dfs(i, set1, set2, graph)) return false;
+                if (set1[i] || set2[i]) {
+                    continue;
+                }
+                if (!dfs(i, set1, set2, graph)) {
+                    return false;
+                }
             }
             return true;
         }
 
         private static boolean dfs(int index, boolean[] set1, boolean[] set2, int[][] graph) {
             size++;
-            if (set1[index]) return !set2[index];
+            if (set1[index]) {
+                return !set2[index];
+            }
             set1[index] = true;
             for (int n : graph[index]) {
-                if (!dfs(n, set2, set1, graph)) return false;
+                if (!dfs(n, set2, set1, graph)) {
+                    return false;
+                }
             }
             return true;
         }

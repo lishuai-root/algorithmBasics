@@ -158,7 +158,9 @@ public class LeetCode_080 {
 
             cur = i;
 
-            while (++cur < len && nums[cur] == nums[i]) ;
+            while (++cur < len && nums[cur] == nums[i]) {
+                ;
+            }
 
 //            while (i < len && i < j) {
 //

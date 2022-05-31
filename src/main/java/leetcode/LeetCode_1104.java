@@ -68,8 +68,9 @@ public class LeetCode_1104 {
 
     public static int numberOfLeadingZeros(int i) {
         // HD, Count leading 0's
-        if (i <= 0)
+        if (i <= 0) {
             return i == 0 ? 32 : 0;
+        }
         int n = 31;
         if (i >= 1 << 16) {
             n -= 16;

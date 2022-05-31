@@ -14,11 +14,24 @@ package leetcode;
 public class LeetCode_647 {
     public static void main(String[] args) {
 
-        String s = "abc";
+//        String s = "abc";
+//
+//        int i = countSubstrings(s);
+//
+//        System.out.println(i);
+//        int i1 = countSubstrings_03(s);
+//        System.out.println(i1);
 
-        int i = countSubstrings(s);
+        String s = "a".repeat(100000);
+        long start = System.currentTimeMillis();
+        int i = countSubstrings_03(s);
+        long end = System.currentTimeMillis();
+        System.out.println("03 : " + (end - start));
 
-        System.out.println(i);
+        start = System.currentTimeMillis();
+        int i2 = countSubstrings_02(s);
+        end = System.currentTimeMillis();
+        System.out.println("02 : " + (end - start));
     }
 
 
@@ -55,6 +68,23 @@ public class LeetCode_647 {
         return result;
     }
 
+    public static int countSubstrings_03(String s) {
+        char[] chars = s.toCharArray();
+        int ans = 0;
+
+        for (int i = 0; i < chars.length; i++) {
+            ans += (((isSubstrings(chars, i, i) + 1) >>> 1) + ((isSubstrings(chars, i, i + 1) + 1) >>> 1));
+        }
+        return ans;
+    }
+
+    private static int isSubstrings(char[] chars, int left, int right) {
+        while (left >= 0 && right < chars.length && chars[left] == chars[right]) {
+            left--;
+            right++;
+        }
+        return right - left - 1;
+    }
 
     /**
      * teacher method
@@ -82,9 +112,9 @@ public class LeetCode_647 {
         for (int i = 0; i < str.length; i++) {
             pArr[i] = R > i ? Math.min(pArr[2 * C - i], R - i) : 1;
             while (i + pArr[i] < str.length && i - pArr[i] > -1) {
-                if (str[i + pArr[i]] == str[i - pArr[i]])
+                if (str[i + pArr[i]] == str[i - pArr[i]]) {
                     pArr[i]++;
-                else {
+                } else {
                     break;
                 }
             }
@@ -105,5 +135,6 @@ public class LeetCode_647 {
         }
         return res;
     }
+
 
 }
