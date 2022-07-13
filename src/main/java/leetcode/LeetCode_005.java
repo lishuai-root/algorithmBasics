@@ -32,17 +32,17 @@ public class LeetCode_005 {
 //        System.out.println(s2);
 //        System.out.println(s1.length());
 
-        String s = makeStr(100000);
+        String s = makeStr(500000);
 
         long start = System.currentTimeMillis();
         String s1 = longestPalindrome_04(s);
         long end = System.currentTimeMillis();
-        System.out.println("times  5: " + (end - start));
+        System.out.println("times  4 : " + (end - start));
 
         start = System.currentTimeMillis();
         String s2 = longestPalindrome_05(s);
         end = System.currentTimeMillis();
-        System.out.println("times 4 : " + (end - start));
+        System.out.println("times 5 : " + (end - start));
     }
 
     private static String makeStr(int len) {

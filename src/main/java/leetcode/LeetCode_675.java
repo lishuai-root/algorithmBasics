@@ -2,6 +2,8 @@ package leetcode;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.PriorityQueue;
+import java.util.Queue;
 
 /**
  * @description: You are asked to cut off all the trees in a forest for a golf event.
@@ -27,149 +29,86 @@ import java.util.List;
  */
 
 public class LeetCode_675 {
-    private static final int[][] cache = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
+
+    private static final int[][] TMP = {{0, 1}, {1, 0}, {0, -1}, {-1, 0}};
 
 
     public static void main(String[] args) {
-        List<List<Integer>> lists = makeList();
-        int i = cutOffTree(lists);
-
-        System.out.println("----------------");
-        for (List<Integer> list : lists) {
-            for (int j : list) {
-                System.out.print(j + " ");
-            }
-            System.out.println();
-        }
-        System.out.println("----------------");
-        System.out.println(i);
-
+        int[][] nums = {
+                {54581641, 64080174, 24346381, 69107959},
+                {86374198, 61363882, 68783324, 79706116},
+                {668150, 92178815, 89819108, 94701471},
+                {83920491, 22724204, 46281641, 47531096},
+                {89078499, 18904913, 25462145, 60813308}
+        };
+        List<List<Integer>> lists = makeList(nums);
+        System.out.println(cutOffTree(lists));
     }
 
-    private static List<List<Integer>> makeList() {
-//        int[][] ints = {{1, 2, 3}, {0, 0, 0}, {7, 6, 5}};
-//        int[][] ints = {{2, 3, 4}, {0, 0, 5}, {8, 7, 6}};
-//        int[][] ints = {{1, 2, 3}, {0, 0, 4}, {7, 6, 5}};
-        int[][] ints = {{54581641, 64080174, 24346381, 69107959}, {86374198, 61363882, 68783324, 79706116}, {668150, 92178815, 89819108, 94701471}, {83920491, 22724204, 46281641, 47531096}, {89078499, 18904913, 25462145, 60813308}};
+    private static List<List<Integer>> makeList(int[][] nums) {
         List<List<Integer>> list = new ArrayList<>();
-        System.out.println("=====================");
-        for (int[] arr : ints) {
-            ArrayList<Integer> l = new ArrayList<>();
-            list.add(l);
-            for (int i : arr) {
-
+        for (int[] ints : nums) {
+            List<Integer> l = new ArrayList<>();
+            for (int i : ints) {
                 l.add(i);
-                System.out.print(i + " ");
             }
-            System.out.println();
+            list.add(l);
         }
-        System.out.println("=====================");
         return list;
     }
 
     public static int cutOffTree(List<List<Integer>> forest) {
+        Queue<int[]> queue = new PriorityQueue<>((a, b) -> {
+            return forest.get(a[0]).get(a[1]) - forest.get(b[0]).get(b[1]);
+        });
 
-        int sum = isTree(forest);
-        if (sum == -1) {
-            System.out.println("---------------");
-            return -1;
-        }
-
-        System.out.println("sum : " + sum);
-
-//        System.out.println("-------------------------");
-//        for (List<Integer> list : forest) {
-//            for (int l : list) {
-//                System.out.print(l + " ");
-//                if (l > 1) {
-////                    return -1;
-//                    i = -1;
-//                }
-//            }
-//            System.out.println();
-//        }
-//        System.out.println("-------------------------");
-        boolean[][] bs = new boolean[forest.size()][forest.get(0).size()];
-        return cutOffTreeProcess(forest, 0, 0, 0, sum - 1, bs);
-    }
-
-    private static int cutOffTreeProcess(List<List<Integer>> forest, int row, int col, int pace, int sum, boolean[][] bs) {
-//        System.out.println("---------");
-
-        if (sum <= 0) {
-            System.out.println("++++++++++++++++");
-            for (List<Integer> list : forest) {
-                for (int i : list) {
-                    System.out.print(i + " ");
+        int[] cur = {0, 0}, next;
+        int lenR = forest.size(), lenC = forest.get(lenR - 1).size();
+        for (int i = 0; i < lenR; i++) {
+            for (int j = 0; j < lenC; j++) {
+                if (forest.get(i).get(j) > 1) {
+                    queue.offer(new int[]{i, j});
                 }
-                System.out.println();
-            }
-            System.out.println("++++++++++++++++");
-            return pace;
-        }
-
-        int ans = Integer.MAX_VALUE, r = row, c = col, b = forest.get(row).get(col);
-        forest.get(row).set(col, 1);
-        for (int[] ints : cache) {
-            r = row + ints[0];
-            c = col + ints[1];
-            if (r < 0 || r >= forest.size() || c < 0 || c >= forest.get(row).size() || forest.get(r).get(c) <= 1 || forest.get(r).get(c) < b) {
-                continue;
-            }
-
-            ans = Math.min(ans, cutOffTreeProcess(forest, r, c, pace + 1, sum - 1, bs));
-
-        }
-
-        if (ans == Integer.MAX_VALUE) {
-            for (int[] ints : cache) {
-                r = row + ints[0];
-                c = col + ints[1];
-                if (r < 0 || r >= forest.size() || c < 0 || c >= forest.get(row).size() || forest.get(r).get(c) != 1 || bs[r][c]) {
-                    continue;
-                }
-//                System.out.println("............");
-                bs[r][c] = true;
-//                forest.get(row).set(col, 1);
-                ans = Math.min(ans, cutOffTreeProcess(forest, r, c, pace + 1, sum, bs));
-                bs[r][c] = false;
-//                forest.get(row).set(col, b);
             }
         }
-        forest.get(row).set(col, b);
+        int ans = 0;
+        while (!queue.isEmpty()) {
+            next = queue.poll();
+            int k = isConnect(forest, cur, next);
+            if (k == -1) {
+                return -1;
+            }
+            ans += k;
+            cur = next;
+        }
         return ans;
     }
 
-    private static int isTree(List<List<Integer>> list) {
-        int r = list.size(), c = list.get(0).size(), ans = 0;
-        int[][] bs = new int[r][c];
-        isTreeProcess(list, 0, 0, bs);
+    private static int isConnect(List<List<Integer>> forest, int[] start, int[] end) {
+        Queue<int[]> queue = new PriorityQueue<>((a, b) -> {
+            return a[2] - b[2];
+        });
+        queue.offer(new int[]{start[0], start[1], 0});
+        int lenR = forest.size(), lenC = forest.get(lenR - 1).size();
+        boolean[][] bls = new boolean[lenR][lenC];
 
-        for (int i = 0; i < r; i++) {
-            for (int j = 0; j < c; j++) {
-                if (list.get(i).get(j) > 1) {
-                    if (bs[i][j] == 0) {
-                        return -1;
+        while (!queue.isEmpty()) {
+            int[] curs = queue.poll();
+            if (curs[0] == end[0] && curs[1] == end[1]) {
+                return curs[2];
+            }
+
+            for (int[] ints : TMP) {
+                int r = curs[0] + ints[0];
+                int c = curs[1] + ints[1];
+                if (r >= 0 && r < lenR && c >= 0 && c < lenC && !bls[r][c]) {
+                    if (forest.get(r).get(c) != 0) {
+                        bls[r][c] = true;
+                        queue.offer(new int[]{r, c, curs[2] + 1});
                     }
-                    ans++;
                 }
             }
         }
-        return ans;
-    }
-
-    private static void isTreeProcess(List<List<Integer>> list, int row, int col, int[][] bs) {
-        if (row < 0 || row >= list.size() || col < 0 || col >= list.get(row).size() || bs[row][col] > 0) {
-            return;
-        }
-
-        if (list.get(row).get(col) == 0) {
-            bs[row][col] = 2;
-            return;
-        }
-        bs[row][col] = 1;
-        for (int[] ints : cache) {
-            isTreeProcess(list, row + ints[0], col + ints[1], bs);
-        }
+        return -1;
     }
 }
