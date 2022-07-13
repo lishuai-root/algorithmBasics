@@ -4,18 +4,18 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @description: You are given the root of a binary tree.
- * We install cameras on the tree nodes where each camera at a node can monitor its parent, itself, and its immediate children.
- * <p>
- * Return the minimum number of cameras needed to monitor all nodes of the tree.
+ * @description: You are given the root of a binary tree. We install cameras on the tree nodes where
+ * each camera at a node can monitor its parent, itself, and its immediate children.
+ * <p>Return the minimum number of cameras needed to monitor all nodes of the tree.
  * @author: LISHUAI
  * @createDate: 2021/12/30 21:38
  * @version: 1.0
  */
-
 public class LeetCode_968 {
 
-    private static int[] arr = {0, 0, Integer.MAX_VALUE, Integer.MAX_VALUE, 0, 0, Integer.MAX_VALUE, Integer.MAX_VALUE, 0, 0};
+    private static int[] arr = {
+            0, 0, Integer.MAX_VALUE, Integer.MAX_VALUE, 0, 0, Integer.MAX_VALUE, Integer.MAX_VALUE, 0, 0
+    };
 
     private static Map<TreeNode, Integer> map;
 
@@ -31,7 +31,6 @@ public class LeetCode_968 {
 
         System.out.println(i);
     }
-
 
     private static TreeNode makeTree(int[] arr) {
 
@@ -64,12 +63,10 @@ public class LeetCode_968 {
         return Math.max(viewTree(root.left), viewTree(root.right)) + 1;
     }
 
-
     public static int minCameraCover_002(TreeNode root) {
 
         return 0;
     }
-
 
     public static int minCameraCover(TreeNode root) {
 
@@ -79,7 +76,6 @@ public class LeetCode_968 {
 
         return Math.max(process(root, 2), 1);
     }
-
 
     private static int process(TreeNode root, int level) {
 
@@ -95,20 +91,20 @@ public class LeetCode_968 {
 
         int min, n, l2, r2;
 
+        //        min = process(root.left, 1) + process(root.right, 1) + 1;
 
-//        min = process(root.left, 1) + process(root.right, 1) + 1;
-
-        min = map.containsKey(root) ? map.get(root) : process(root.left, 1) + process(root.right, 1) + 1;
+        min =
+                map.containsKey(root) ? map.get(root) : process(root.left, 1) + process(root.right, 1) + 1;
 
         if (!map.containsKey(root)) {
 
             map.put(root, min);
         }
 
-//        if (level == 3) {
-//
-//            return min;
-//        }
+        //        if (level == 3) {
+        //
+        //            return min;
+        //        }
 
         l2 = mapTwo.containsKey(root.left) ? mapTwo.get(root.left) : process(root.left, 2);
 
@@ -154,7 +150,6 @@ public class LeetCode_968 {
 
         return min;
     }
-
 
     public static class TreeNode {
         int val;

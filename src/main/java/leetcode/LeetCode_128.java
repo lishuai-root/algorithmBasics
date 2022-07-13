@@ -1,6 +1,9 @@
 package leetcode;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
 
 /**
  * @description: Given an unsorted array of integers nums, return the length of the longest consecutive elements sequence.
@@ -12,14 +15,25 @@ import java.util.*;
  */
 
 public class LeetCode_128 {
+    private static int count = 0;
 
     public static void main(String[] args) {
 
-        int[] arr = new int[]{0, 3, 7, 2, 5, 8, 4, 6, 0, 1};
-
+//        int[] arr = new int[]{0, 3, 7, 2, 5, 8, 4, 6, 0, 1};
+        int[] arr = makeArr(100000);
         int i = longestConsecutive_02(arr);
 
         System.out.println(i);
+        System.out.println(count);
+    }
+
+    private static int[] makeArr(int size) {
+        int[] nums = new int[size];
+        Random random = new Random();
+        for (int i = 0; i < size; i++) {
+            nums[i] = random.nextInt(size << 1);
+        }
+        return nums;
     }
 
     public static int longestConsecutive(int[] nums) {
@@ -51,187 +65,27 @@ public class LeetCode_128 {
 
     public static int longestConsecutive_02(int[] nums) {
 
-        Map<Integer, Integer> minMap = new HashMap<>();
-
-        Map<Integer, Integer> maxMap = new HashMap<>();
-
-        Map<Integer, List<Integer>> indexMap = new HashMap<>();
-
-        List<Integer> list = new ArrayList<>();
-
-        List<Integer> l;
-
-        Set<Integer> set = new HashSet<>(nums.length);
-
-        int maxLen = 0, nowIndex;
-
+        Map<Integer, Integer> map = new HashMap<>();
+        for (int i : nums) {
+            map.put(i, -1);
+        }
+        int ans = 0;
         for (int num : nums) {
-
-            if (set.contains(num)) {
-
-                continue;
-            }
-
-            if (minMap.containsKey(num + 1)) {
-
-                nowIndex = minMap.get(num + 1);
-
-                l = indexMap.get(nowIndex);
-
-                l.add(num);
-
-                minMap.remove(num + 1);
-
-                minMap.put(num, nowIndex);
-
-                list.add(nowIndex, list.get(nowIndex) + 1);
-
-                maxLen = Math.max(maxLen, list.get(nowIndex));
-
-//                if (maxMap.containsKey(num - 1)) {
-//
-//                    list.add(maxMap.get(num - 1), list.get(maxMap.get(num - 1)) + list.get(nowIndex));
-//
-//                    list.add(nowIndex, list.get(maxMap.get(num - 1)));
-//
-//                    maxLen = Math.max(maxLen, list.get(nowIndex));
-//                }
-
-            } else if (maxMap.containsKey(num - 1)) {
-
-                nowIndex = maxMap.get(num - 1);
-
-                l = indexMap.get(nowIndex);
-
-                l.add(num);
-
-                maxMap.remove(num - 1);
-
-                maxMap.put(num, nowIndex);
-
-                list.add(nowIndex, list.get(nowIndex) + 1);
-
-                maxLen = Math.max(maxLen, list.get(nowIndex));
-
-//                if (minMap.containsKey(num + 1)) {
-//
-//                    list.add(minMap.get(num + 1), list.get(minMap.get(num + 1)) + list.get(nowIndex));
-//
-//                    list.add(nowIndex, list.get(minMap.get(num + 1)));
-//
-//                    maxLen = Math.max(maxLen, list.get(nowIndex));
-//                }
-            } else {
-
-                maxLen = Math.max(maxLen, 1);
-
-                list.add(1);
-
-                minMap.put(num, list.size() - 1);
-
-                maxMap.put(num, list.size() - 1);
-
-                l = new ArrayList<>();
-
-                l.add(num);
-
-                l.add(num);
-
-                indexMap.put(list.size() - 1, l);
-
-            }
-
-            if (maxMap.containsKey(num - 1)) {
-
-                nowIndex = minMap.get(num);
-
-                list.add(maxMap.get(num - 1), list.get(maxMap.get(num - 1)) + list.get(nowIndex));
-
-                list.add(nowIndex, list.get(maxMap.get(num - 1)));
-
-                maxLen = Math.max(maxLen, list.get(nowIndex));
-
-                l = indexMap.get(maxMap.get(num - 1));
-
-                for (Integer integer : l) {
-                    maxMap.put(integer, nowIndex);
-                }
-
-                indexMap.remove(maxMap.get(num - 1));
-
-
-                if (indexMap.get(nowIndex) != null) {
-                    l.addAll(indexMap.get(nowIndex));
-                }
-
-                indexMap.put(nowIndex, l);
-
-            }
-
-            if (minMap.containsKey(num + 1)) {
-
-                nowIndex = maxMap.get(num);
-
-                list.add(minMap.get(num + 1), list.get(minMap.get(num + 1)) + list.get(nowIndex));
-
-                list.add(nowIndex, list.get(minMap.get(num + 1)));
-
-                maxLen = Math.max(maxLen, list.get(nowIndex));
-
-                minMap.put(minMap.get(num + 1), nowIndex);
-
-                l = indexMap.get(maxMap.get(num + 1));
-
-                for (Integer integer : l) {
-                    minMap.put(integer, nowIndex);
-                }
-                indexMap.remove(minMap.get(num + 1));
-
-                if (indexMap.get(nowIndex) != null) {
-                    l.addAll(indexMap.get(nowIndex));
-                }
-
-
-                indexMap.put(nowIndex, l);
-
-            }
-
-            set.add(num);
+            ans = Math.max(ans, longestConsecutiveProcess(map, num));
         }
+        return ans;
+    }
 
-
-        for (Integer integer : list) {
-
-            System.out.print(integer + "   ");
+    private static int longestConsecutiveProcess(Map<Integer, Integer> map, int cur) {
+        count++;
+        if (!map.containsKey(cur)) {
+            return 0;
         }
-
-        System.out.println();
-
-        Set<Integer> integers = minMap.keySet();
-
-        Iterator<Integer> iterator = integers.iterator();
-
-        while (iterator.hasNext()) {
-
-            Integer next = iterator.next();
-
-            System.out.println("min next : " + next + "   val : " + list.get(minMap.get(next)));
+        if (map.get(cur) != -1) {
+            return map.get(cur);
         }
-
-        System.out.println("----------------");
-
-        integers = maxMap.keySet();
-
-        iterator = integers.iterator();
-
-        while (iterator.hasNext()) {
-
-            Integer next = iterator.next();
-
-            System.out.println("max next : " + next + "   val : " + list.get(maxMap.get(next)));
-        }
-        System.out.println();
-
-        return maxLen;
+        int ans = longestConsecutiveProcess(map, cur + 1) + 1;
+        map.put(cur, ans);
+        return ans;
     }
 }

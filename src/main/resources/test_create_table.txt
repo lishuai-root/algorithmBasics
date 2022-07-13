@@ -1,0 +1,10 @@
+
+
+create table nsrsdb.analysis
+
+    (name varchar(128),
+    age int,    --年龄
+    address varchar(256),
+    money double(12, 2))
+;
+gfhfhf
