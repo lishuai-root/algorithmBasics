@@ -9,6 +9,8 @@
         <option value="organizeImports" />
         <option value="reformat" />
         <option value="rearrange" />
+        <option value="missingOverrideAnnotation" />
+        <option value="generateSerialVersionUID" />
       </set>
     </option>
     <option name="configurationPath" value="" />

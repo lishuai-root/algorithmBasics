@@ -32,7 +32,7 @@ public class LeetCode_315 {
         }
         System.out.println(nums.length);
 
-        List<Integer> list = countSmaller_02(nums);
+        List<Integer> list = countSmaller_03(nums);
         System.out.println(list.size());
     }
 
@@ -43,8 +43,8 @@ public class LeetCode_315 {
         }
 
         List<Integer> ans = new ArrayList<>();
-        for (int i = 0; i < nums.length; i++) {
-            int c = nums[i], s = 0;
+        for (int num : nums) {
+            int c = num, s = 0;
             for (int k : map.keySet()) {
                 if (k >= c) {
                     continue;
@@ -52,7 +52,7 @@ public class LeetCode_315 {
                 s += map.get(k);
             }
             ans.add(s);
-            map.put(nums[i], map.get(nums[i]) - 1);
+            map.put(num, map.get(num) - 1);
         }
 
         return ans;
@@ -64,12 +64,28 @@ public class LeetCode_315 {
         System.out.println("treeRoot left : " + treeRoot.leftSize + ", treeRoot right : " + treeRoot.rightSize);
 
         System.out.println(treeHight(treeRoot));
-        for (int i = 0; i < nums.length; i++) {
+        for (int num : nums) {
 //            ans.add(nums.length - i - getMin(root, nums[i], 0));
 //            System.out.println(i);
-            ans.add(getMin(treeRoot, nums[i], 0));
+            ans.add(getMin(treeRoot, num, 0));
         }
         return ans;
+    }
+
+    public static List<Integer> countSmaller_03(int[] nums) {
+        int len = nums.length;
+        treeRoot = add(treeRoot, nums[len - 1]);
+        int[] ans = new int[len];
+        ans[len - 1] = 0;
+        for (int i = len - 2; i >= 0; i--) {
+            ans[i] = getMinSize(treeRoot, nums[i], 0);
+            treeRoot = add(treeRoot, nums[i]);
+        }
+        List<Integer> result = new ArrayList<>();
+        for (int i : ans) {
+            result.add(i);
+        }
+        return result;
     }
 
     private static void showTree(Node root) {
@@ -122,6 +138,34 @@ public class LeetCode_315 {
 //        root.rightSize = root.right == null ? 0 : root.right.leftSize + root.right.rightSize + root.right.curSize;
 //        return root;
 //    }
+
+    private static int getMinSize(Node root, int val, int size) {
+        int c = 0, pre = 0;
+        Node node = root;
+        while (root != null) {
+            pre = c;
+            c = root.val - val;
+            node = root;
+
+            if (c > 0) {
+                root.leftSize--;
+                root = root.left;
+            } else if (c < 0) {
+                size += root.leftSize + root.curSize;
+                root.rightSize--;
+                root = root.right;
+            } else {
+                root.curSize--;
+                break;
+            }
+        }
+//        int ans = size + root.leftSize;
+//        if (root.curSize == 0) {
+//            treeRoot = delete(treeRoot, val);
+//        }
+
+        return size;
+    }
 
     private static int getMin(Node root, int val, int size) {
         int c = 0, pre = 0;

@@ -13,6 +13,12 @@ import java.util.Random;
 
 public class TreeText {
 
+    Child child;
+
+    public TreeText(Child c) {
+        this.child = c;
+    }
+
     public static void main(String[] args) {
 
         String[] words = new String[]{"huihui", "huihui", "shuaishuai", "aaa"};

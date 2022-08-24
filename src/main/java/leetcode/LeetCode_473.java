@@ -29,7 +29,7 @@ public class LeetCode_473 {
             max = Math.max(max, i);
         }
         int mid = sum >>> 2;
-        if (sum % 4 != 0 || mid < max) {
+        if ((sum & 3) != 0 || mid < max) {
             return false;
         }
         Arrays.sort(matchsticks);
