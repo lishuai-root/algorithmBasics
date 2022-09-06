@@ -21,46 +21,44 @@ package leetcode;
 
 public class LeetCode_1145 {
 
-    private static int size = 0;
-
-    private static boolean bl;
+    public static void main(String[] args) {
+        TreeNode treeNode = new TreeNode(1);
+        treeNode.left = new TreeNode(2);
+        treeNode.right = new TreeNode(3);
+        boolean b = btreeGameWinningMove(treeNode, 3, 2);
+        System.out.println(b);
+    }
 
     public static boolean btreeGameWinningMove(TreeNode root, int n, int x) {
 
-        process(root, x);
-
-        size++;
-
-        System.out.println(size);
-
-        return size < n >>> 1;
+        TreeNode node = getNode(root, x);
+        int left = getSize(node.left);
+        int right = getSize(node.right);
+        if (n - (left + right + 1) > left + right + 1) {
+            return true;
+        }
+        return Math.max(left, right) > n - Math.max(left, right);
     }
 
-    private static void process(TreeNode root, int x) {
-
+    private static int getSize(TreeNode root) {
         if (root == null) {
-
-            return;
+            return 0;
         }
+        return getSize(root.left) + getSize(root.right) + 1;
+    }
 
-        if (root.val == x) {
-
-            bl = true;
+    private static TreeNode getNode(TreeNode root, int value) {
+        if (root == null) {
+            return root;
         }
-
-        if (bl) {
-
-            size++;
+        if (root.val == value) {
+            return root;
         }
-
-        process(root.left, x);
-
-        process(root.right, x);
-
-        if (root.val == x) {
-
-            bl = false;
+        TreeNode node = getNode(root.left, value);
+        if (node != null) {
+            return node;
         }
+        return getNode(root.right, value);
     }
 
     public static class TreeNode {
