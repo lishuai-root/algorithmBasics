@@ -58,9 +58,9 @@ var mergeTwoLists = function (list1, list2) {
     return allHead.next;
 };
 
-function fn() {
-    window.console.log("fn function.")
-}
+(function fn() {
+    console.log("fn function.")
+})();
 
 // void main()
 // {

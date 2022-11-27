@@ -12,9 +12,10 @@ import java.util.Arrays;
 public class LeetCode_718 {
 
     private static Boolean[][][] cache;
+    private static int allAns;
 
     public static void main(String[] args) {
-//        int[] nums1 = {1, 2, 3, 2, 1}, nums2 = {3, 2, 1, 4, 7};
+//        int[] nums1 = {1, 2, 3, 2, 1}, nums2 = {3, 32, 1, 4, 7};
 //        int[] nums1 = {0, 0, 1, 0, 0, 1, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1, 1, 0, 1, 0, 0, 0, 0, 1, 0, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 0, 1, 0, 0, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0},
 //                nums2 = {0, 0, 0, 0, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 1, 1, 0, 0, 1, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0};
 //        int[] nums1 = {0, 0, 0, 0, 0}, nums2 = {0, 0, 0, 0, 0};
@@ -30,6 +31,8 @@ public class LeetCode_718 {
 //        int[] nums2 = {1, 1, 0, 1, 1, 0, 0, 0, 0, 0};
         int length = findLength_a(nums1, nums2);
         System.out.println(length);
+        int length1 = findLength_dp(nums1, nums2);
+        System.out.println(length1);
 
 //        int sum = 0;
 //        for (int i : nums1) {
@@ -40,10 +43,48 @@ public class LeetCode_718 {
 //        }
 //        System.out.println(sum);
 
-        String s1 = "100000";
-        String s2 = "1101100000";
-        int kmp = KMP(s2, s1);
-        System.out.println(kmp);
+//        String s1 = "100000";
+//        String s2 = "1101100000";
+//        int kmp = KMP(s2, s1);
+//        System.out.println(kmp);
+    }
+
+    public static int findLength_02(int[] nums1, int[] nums2) {
+        allAns = 0;
+        findLengthProcess(nums1, nums2, 0, 0);
+        return allAns;
+    }
+
+    private static int findLengthProcess(int[] nums1, int[] nums2, int index1, int index2) {
+        if (index1 >= nums1.length || index2 >= nums2.length) {
+            return 0;
+        }
+
+//        int p1 = 0;
+//        if (nums1[index1] == nums2[index2]) {
+//            p1 = findLengthProcess(nums1, nums2, index1 + 1, index2 + 1) + 1;
+//        }
+        int p2 = findLengthProcess(nums1, nums2, index1 + 1, index2);
+        int p3 = findLengthProcess(nums1, nums2, index1, index2 + 1);
+//        return Math.max(p1, Math.max(p2, p3));
+        int ans = nums1[index1] == nums2[index2] ? Math.max(p2, p3) + 1 : 0;
+        allAns = Math.max(allAns, ans);
+        return ans;
+    }
+
+
+    public static int findLength_dp(int[] nums1, int[] nums2) {
+        int len1 = nums1.length, len2 = nums2.length;
+        int[] dp = new int[len2 + 1];
+        int ans = 0;
+
+        for (int i = len1 - 1; i >= 0; i--) {
+            for (int j = 0; j < len2; j++) {
+                dp[j] = nums1[i] == nums2[j] ? dp[j + 1] + 1 : 0;
+                ans = Math.max(ans, dp[j]);
+            }
+        }
+        return ans;
     }
 
     public static int findLength_a(int[] nums1, int[] nums2) {
