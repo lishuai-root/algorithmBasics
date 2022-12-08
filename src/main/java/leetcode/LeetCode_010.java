@@ -1,8 +1,5 @@
 package leetcode;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * @description: https://leetcode.com/problems/regular-expression-matching/
  * <p>
@@ -26,174 +23,67 @@ public class LeetCode_010 {
 
     public static void main(String[] args) {
 
-        String s = "aa", p = "a";
+//        String s = "aa", p = "a";
+//        String s = "aaa", p = "aaaa";
+//        String s = "aab", p = "c*a*b";
+        String s = "ab", p = ".*..";
+//        String s = "mississippi", p = "mis*is*p*.";
+//        String s = "ab", p = ".*c";
 
         boolean match = isMatch(s, p);
-        boolean match2 = isMatch_02(s, p);
 
         System.out.println(match);
-        System.out.println(match2);
+        System.out.println(isMatch_dp(s, p));
 
-    }
-
-    public static boolean isMatch_02(String s, String p) {
-        int len = p.length(), left = 0, right = 0, index = 0;
-        boolean ans = true, isc = false;
-
-        while (index < s.length() && right < len && ans) {
-            left = right;
-            while (right < len) {
-                if (p.charAt(right) == '.' || p.charAt(right) == '*') {
-                    break;
-                }
-                right++;
-            }
-            isc = false;
-            if (p.charAt(left) == '.') {
-                right++;
-                index++;
-                continue;
-            }
-
-            if (p.charAt(left) == '*') {
-                right++;
-                isc = true;
-                continue;
-            }
-            if (isc) {
-                int i = s.substring(index).indexOf(p.substring(left, right));
-                if (i != -1) {
-                    ans = true;
-                } else {
-                    ans = false;
-                }
-                index += i + right - left;
-            } else {
-                ans = s.substring(index).startsWith(p.substring(left, right));
-                index += right - left;
-            }
-        }
-
-        return (ans && index >= s.length()) || isc;
     }
 
     public static boolean isMatch(String s, String p) {
+        boolean ans = false;
+        ans = isMatchProcess(s, p, s.length() - 1, p.length() - 1);
+        return ans;
+    }
 
-        boolean result = false;
+    private static boolean isMatchProcess(String s, String p, int startS, int startP) {
+        if (startP < 0) {
+            return startS < 0;
+        }
 
-        char sc = ' ', pc = ' ', beforePC = ' ';
-
-        int pLen = p.length(), sLen = s.length();
-
-        int i = 0, j = 0;
-
-        System.out.println("s : " + s);
-        System.out.println("p : " + p);
-
-        for (; i < sLen && j < pLen; i++, j++) {
-
-            sc = s.charAt(i);
-
-            pc = p.charAt(j);
-
-            if (pc == '.' || pc == sc) {
-
-                continue;
-            } else if (pc == '*') {
-
-                if (p.charAt(j - 1) == '.') {
-
-                    if (j + 1 >= pLen) {
-
-                        return true;
-                    } else {
-
-                        beforePC = p.charAt(j + 1);
-
-                        while (sc != beforePC && ++i < sLen) {
-
-                            sc = s.charAt(i);
-                        }
-
-                        i++;
-                    }
-
-                } else {
-
-//                    beforePC = p.charAt(j - 1);
-//
-//                    while (sc == beforePC && ++i < sLen) {
-//
-//                        sc = s.charAt(i);
-//                    }
-//
-//                    while (++j < pLen && beforePC == p.charAt(j)) ;
-//
-//                    j--;
-//
-//                    i--;
-
-                    beforePC = p.charAt(j - 1);
-
-                    while (sc == beforePC && (i + 1) < sLen) {
-
-                        System.out.println("sc : " + sc);
-                        System.out.println("beforePC : " + beforePC);
-
-
-                        result = isMatch(s.substring(i - 1, sLen), p.substring(j + 1, pLen));
-
-
-                        if (result) {
-
-                            return result;
-                        }
-
-                        sc = s.charAt(++i);
-                    }
-
-//                    j--;
-
-                    if (i + 1 != sLen)
-                        i--;
-                }
-
-            } else {
-
-                if ((j + 1 >= pLen) || (p.charAt(j + 1) != '*')) {
-
-
-                    return false;
-                }
-
-
-                i--;
+        boolean ans = false;
+        if (startS >= 0 && (p.charAt(startP) == '.' || s.charAt(startS) == p.charAt(startP))) {
+            ans = isMatchProcess(s, p, startS - 1, startP - 1);
+        } else if (p.charAt(startP) == '*') {
+            ans = isMatchProcess(s, p, startS, startP - 2);
+            if (!ans && startS >= 0 && (p.charAt(startP - 1) == '.' || s.charAt(startS) == p.charAt(startP - 1))) {
+                ans = isMatchProcess(s, p, startS - 1, startP)
+                        || isMatchProcess(s, p, startS - 1, startP - 2);
             }
-
         }
-
-        System.out.println("i : " + i);
-        System.out.println("j : " + j);
-        System.out.println("s : " + s);
-        System.out.println("p : " + p);
-        return i >= sLen && j >= pLen;
+        return ans;
     }
 
-    private static List process(String s, int sLeft, int sRight, String p, int pLeft, int pRight) {
+    public static boolean isMatch_dp(String s, String p) {
+        int sLen = s.length(), pLen = p.length();
+        boolean[][] dp = new boolean[sLen + 1][pLen + 1];
+        char[] sc = s.toCharArray(), pc = p.toCharArray();
+        dp[0][0] = true;
 
-        ArrayList<Integer> list = null;
-
-        if (sLeft > sRight || pLeft > pRight) {
-
-            return list;
+        for (int i = -1; i < sLen; i++) {
+            for (int j = 0; j < pLen; j++) {
+                boolean ans = false;
+                if (i >= 0 && (pc[j] == '.' || sc[i] == pc[j])) {
+                    ans = dp[i][j];
+                } else if (p.charAt(j) == '*') {
+                    ans = dp[i + 1][j - 1];
+                    if (!ans && i >= 0 && (pc[j - 1] == '.' || sc[i] == pc[j - 1])) {
+                        ans = dp[i][j + 1] || dp[i][j - 1];
+                    }
+                }
+                dp[i + 1][j + 1] = ans;
+            }
         }
-
-        list = new ArrayList<>();
-
-        String ps = p.substring(pLeft, pRight);
-
-        return list;
+        return dp[sLen][pLen];
     }
+
 }
 
 

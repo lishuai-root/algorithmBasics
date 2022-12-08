@@ -49,4 +49,34 @@ public class LeetCode_2225 {
         ans.add(l2);
         return ans;
     }
+
+    public static List<List<Integer>> findWinners_02(int[][] matches) {
+        int[] cache = new int[100001];
+//        Arrays.fill(cache, -1);
+        for (int[] ints : matches) {
+            cache[ints[1]]++;
+        }
+        List<Integer> l1 = new ArrayList<>();
+        List<Integer> l2 = new ArrayList<>();
+        for (int[] ints : matches) {
+            if (cache[ints[0]] == 0) {
+                l1.add(ints[0]);
+            } else if (cache[ints[0]] == 1) {
+                l2.add(ints[0]);
+            }
+            cache[ints[0]] = -1;
+            if (cache[ints[1]] == 0) {
+                l1.add(ints[1]);
+            } else if (cache[ints[1]] == 1) {
+                l2.add(ints[1]);
+            }
+            cache[ints[1]] = -1;
+        }
+        List<List<Integer>> ans = new ArrayList<>();
+        l1.sort(Integer::compare);
+        l2.sort(Integer::compare);
+        ans.add(l1);
+        ans.add(l2);
+        return ans;
+    }
 }
