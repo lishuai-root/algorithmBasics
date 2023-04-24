@@ -161,17 +161,9 @@ public class LeetCode_149 {
         HashSet<String> set = new HashSet<>();
 
         for (int i = 0; i < points.length; i++) {
-
-//            set.clear();
-
             map.clear();
 
-//            System.out.println("-------------------");
-
             for (int j = i + 1; j < points.length; j++) {
-
-//                res = (Math.abs(points[i][1]) - Math.abs(points[j][1])) * 1.00 / ((Math.abs(points[i][0]) - Math.abs(points[j][0])) * 1.00);
-
                 x = points[j][0] - points[i][0];
 
                 y = points[j][1] - points[i][1];
@@ -188,27 +180,11 @@ public class LeetCode_149 {
                     res = x / g + "/" + y / g;
                 }
 
-
-                System.out.println("i :" + i + "   j : " + j);
-
-                System.out.println("res : " + res);
-
-//                if (!set.contains(res)) {
-
                 map.put(res, map.getOrDefault(res, 1) + 1);
 
                 result = Math.max(result, map.get(res));
-
-//                    set.add(res);
-//                }
-
-                System.out.println("max : " + map.get(res));
-
-                System.out.println("---------------");
             }
-
         }
-
         return result;
     }
 }

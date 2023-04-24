@@ -27,36 +27,49 @@ public class LeetCode_834 {
     }
 
     public static int[] sumOfDistancesInTree(int n, int[][] edges) {
-        List<List<Integer>> graph = makeGraph(n, edges);
-        boolean[] bls = new boolean[n];
         int[] ans = new int[n];
-
-        for (int i = 0; i < n; i++) {
-            bls[i] = true;
-            ans[i] = sumOfDistancesInTreeProcess(graph, i, 0, bls);
-            bls[i] = false;
-        }
+        int[] child = new int[n];
+        boolean[] bls = new boolean[n];
+        List<List<Integer>> graph = makeGraph(n, edges);
+        computePath(graph, 0, ans, child, 0, bls);
+        sumOfDistancesInTreeProcess(graph, ans, child, child[0], 0, 0, bls);
         return ans;
     }
 
-    private static int sumOfDistancesInTreeProcess(List<List<Integer>> graph, int cur, int size, boolean[] bls) {
-        List<Integer> list = graph.get(cur);
-        if (list == null || list.isEmpty()) {
-            return size;
+    private static void sumOfDistancesInTreeProcess(List<List<Integer>> graph, int[] ans, int[] child, int all, int cur, int size, boolean[] bls) {
+        if (bls[cur]) {
+            return;
         }
-        int ans = size;
-        for (int next : list) {
-            if (!bls[next]) {
-                bls[next] = true;
-                ans += sumOfDistancesInTreeProcess(graph, next, size + 1, bls);
-                bls[next] = false;
+        bls[cur] = true;
+        List<Integer> list = graph.get(cur);
+        if (!list.isEmpty()) {
+            for (int next : list) {
+                int ns = size + (ans[cur] - ans[next]) + (all - child[next]) - child[next];
+                sumOfDistancesInTreeProcess(graph, ans, child, all, next, ns, bls);
             }
         }
-        return ans;
+        ans[cur] += size;
+    }
+
+    private static int computePath(List<List<Integer>> graph, int cur, int[] ans, int[] child, int size, boolean[] bls) {
+        if (bls[cur]) {
+            return ans[cur];
+        }
+        List<Integer> list = graph.get(cur);
+        bls[cur] = true;
+        int path = 0, ch = 0;
+        for (int next : list) {
+            path += computePath(graph, next, ans, child, size + 1, bls);
+            ch += child[next];
+        }
+        bls[cur] = false;
+        ans[cur] = path - (ch * size);
+        child[cur] = ch + 1;
+        return path + size;
     }
 
     private static List<List<Integer>> makeGraph(int n, int[][] edges) {
-        List<List<Integer>> graph = new ArrayList<>();
+        List<List<Integer>> graph = new ArrayList<>(n);
         for (int i = 0; i < n; i++) {
             graph.add(new ArrayList<>());
         }

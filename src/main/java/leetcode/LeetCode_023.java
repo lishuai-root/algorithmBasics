@@ -1,5 +1,8 @@
 package leetcode;
 
+import java.util.PriorityQueue;
+import java.util.Queue;
+
 /**
  * @description: Given a linked list, swap every two adjacent nodes and return its head.
  * You must solve the problem without modifying the values in the list's nodes (i.e., only nodes themselves may be changed.)
@@ -24,6 +27,27 @@ public class LeetCode_023 {
 
             node = node.next;
         }
+    }
+
+    public static ListNode mergeKLists(ListNode[] lists) {
+        Queue<ListNode> queue = new PriorityQueue<>((a, b) -> b.val - a.val);
+        ListNode head = new ListNode();
+        ListNode node = head;
+        for (ListNode listNode : lists) {
+            if (listNode != null) {
+                queue.offer(listNode);
+            }
+        }
+
+        while (!queue.isEmpty()) {
+            ListNode max = queue.poll();
+            node.next = max;
+            node = max;
+            if (max.next != null) {
+                queue.offer(max.next);
+            }
+        }
+        return head.next;
     }
 
     private static ListNode makeList(int[] arr) {

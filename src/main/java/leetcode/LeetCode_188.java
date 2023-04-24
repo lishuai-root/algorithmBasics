@@ -80,6 +80,9 @@ public class LeetCode_188 {
 
     public static int maxProfit_dp(int k, int[] prices) {
         int len = prices.length;
+        if (k >= (len >>> 1)) {
+            return allTrans(prices);
+        }
         int[][] dp = new int[k + 1][len + 1];
 
         for (int i = k - 1; i >= 0; i--) {

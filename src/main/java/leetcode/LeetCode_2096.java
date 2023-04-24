@@ -1,9 +1,5 @@
 package leetcode;
 
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Set;
-
 /**
  * @description: You are given the root of a binary tree with n nodes.
  * Each node is uniquely assigned a value from 1 to n.
@@ -25,113 +21,83 @@ import java.util.Set;
 
 public class LeetCode_2096 {
 
+    private static TreeNode parent;
 
-    private static boolean bl;
+    private static int startIndex, destIndex;
 
-    private static String result;
-
-    private static int size = 0;
-
-    private static StringBuilder sb = new StringBuilder();
+    public static void main(String[] args) {
+//        TreeNode root = new TreeNode(5);
+//        root.left = new TreeNode(1);
+//        root.left.left = new TreeNode(3);
+//        root.right = new TreeNode(2);
+//        root.right.left = new TreeNode(6);
+//        root.right.right = new TreeNode(4);
+//        String s = getDirections(root, 3, 6);
+//        System.out.println(s);
+        TreeNode root = new TreeNode(2);
+        root.left = new TreeNode(1);
+        String directions = getDirections(root, 2, 1);
+        System.out.println(directions);
+    }
 
     public static String getDirections(TreeNode root, int startValue, int destValue) {
-
-        process(lowestCommonAncestor(root, startValue, destValue), startValue, destValue, "", 0);
-
-        bl = true;
-
-        for (int i = 0; i < size; i++) {
-
-            sb.append("U");
+        int len = 100000;
+        char[] chars = new char[len];
+        startIndex = 0;
+        destIndex = chars.length;
+        parent = null;
+        int[] process = getDirectionsProcess(root, startValue, destValue, chars);
+        if (process[0] == 0 || process[1] == 0) {
+            return "";
         }
-
-        sb.append(result);
-
-        return sb.toString();
+        return String.valueOf(chars, 0, startIndex) + String.valueOf(chars, destIndex, len - destIndex);
     }
 
-    private static void process(TreeNode root, int start, int dest, String str, int len) {
-
-        if (root == null) {
-
-            return;
+    private static int[] getDirectionsProcess(TreeNode root, int startValue, int desValue, char[] chars) {
+        if (root == null || parent != null) {
+            return new int[]{0, 0};
         }
 
-        if (root.val == start) {
+        int[] left = getDirectionsProcess(root.left, startValue, desValue, chars);
+        int[] right = getDirectionsProcess(root.right, startValue, desValue, chars);
+        int[] ans = new int[]{left[0] + right[0], left[1] + right[1]};
+        if (parent == null) {
+            if (left[0] != 0 || right[0] != 0) {
+                chars[startIndex++] = 'U';
+            } else if (root.val == startValue) {
+                ans[0] = root.val;
+            }
+            if (left[1] != 0) {
+                chars[--destIndex] = 'L';
+            } else if (right[1] != 0) {
+                chars[--destIndex] = 'R';
+            } else if (root.val == desValue) {
+                ans[1] = root.val;
+            }
 
-            size = len;
+            if (ans[0] != 0 && ans[1] != 0) {
+                parent = root;
+            }
         }
-
-        if (root.val == dest) {
-
-            result = str;
-
-            return;
-        }
-
-        process(root.left, start, dest, str + "L", len + 1);
-
-        process(root.right, start, dest, str + "R", len + 1);
+        return ans;
     }
 
-    public static TreeNode lowestCommonAncestor(TreeNode root, int start, int dest) {
-
-        Set<TreeNode> set = new HashSet<>();
-
-        bl = false;
-
-        process_02(root, start, dest, set);
-
-        LinkedList<TreeNode> queue = new LinkedList<>();
-
-        queue.addLast(root);
-
-        TreeNode node;
-
-        while (!queue.isEmpty()) {
-
-            node = queue.pollFirst();
-
-            if (set.contains(node)) {
-
-                System.out.println(node.val);
-                return node;
-            }
-
-            if (node.left != null) {
-
-                queue.addLast(node.left);
-            }
-
-            if (node.right != null) {
-
-                queue.addLast(node.right);
-            }
+    private static int findMinPublicParentNode(TreeNode root, int startValue, int destValue) {
+        if (root == null || parent != null) {
+            return 0;
         }
 
-        return null;
-    }
-
-    public static void process_02(TreeNode root, int start, int dest, Set<TreeNode> set) {
-
-        if (root == null) {
-
-            return;
+        int ans = 0;
+        if (root.val == startValue || root.val == destValue) {
+            ans = 1;
         }
-
-        process_02(root.left, start, dest, set);
-
-        if (root.val == start || root.val == dest) {
-
-            bl = !bl;
+        int left = findMinPublicParentNode(root.left, startValue, destValue);
+        int right = findMinPublicParentNode(root.right, startValue, destValue);
+        ans += left + right;
+        if (ans == 2 && parent == null) {
+            parent = root;
         }
-
-        if (bl || root.val == start || root.val == dest) {
-
-            set.add(root);
-        }
-
-        process_02(root.right, start, dest, set);
+        return ans;
     }
 
     public static class TreeNode {

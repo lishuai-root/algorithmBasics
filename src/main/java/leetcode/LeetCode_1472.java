@@ -1,8 +1,5 @@
 package leetcode;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * @description: You have a browser of one tab where you start on the homepage and you can visit another url,
  * get back in the history number of steps or move forward in the history number of steps.
@@ -22,29 +19,38 @@ import java.util.List;
 public class LeetCode_1472 {
     class BrowserHistory {
 
-        List<String> list = new ArrayList<>();
-        int index;
+        private String[] history;
+        private int index, size;
 
         public BrowserHistory(String homepage) {
-            list.add(homepage);
-            index = 0;
+            index = -1;
+            history = new String[16];
+            history[++index] = homepage;
+            size = index;
         }
 
         public void visit(String url) {
-            list.add(url);
-            index = list.size() - 1;
+            if (index >= history.length - 1) {
+                resize();
+            }
+            history[++index] = url;
+            size = index;
         }
 
         public String back(int steps) {
-            int i = Math.min(steps, index);
-            index -= i;
-            return list.get(i);
+            index = Math.max(0, index - steps);
+            return history[index];
         }
 
         public String forward(int steps) {
-            int i = Math.min(steps, list.size() - index - 1);
-            index += i;
-            return list.get(i);
+            index = Math.min(size, index + steps);
+            return history[index];
+        }
+
+        private void resize() {
+            String[] temp = new String[history.length << 1];
+            System.arraycopy(history, 0, temp, 0, history.length);
+            history = temp;
         }
     }
 }

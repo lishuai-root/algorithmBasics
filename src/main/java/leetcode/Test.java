@@ -1,5 +1,7 @@
 package leetcode;
 
+import java.lang.reflect.Method;
+
 /**
  * @description:
  * @author: LISHUAI
@@ -8,20 +10,16 @@ package leetcode;
  */
 
 public class Test {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws NoSuchMethodException {
+        Method method = Test.class.getDeclaredMethod("testMethod", new Class<?>[]{String.class, int.class});
+        System.out.println(method.hashCode());
+        Method method1 = Test.class.getDeclaredMethod("testMethod", new Class<?>[]{String.class, int.class});
+        System.out.println(method.hashCode());
+        System.out.println(method == method1);
+        System.out.println(method.equals(method1));
+    }
 
-        double result = 1;
-
-        int a = 10;
-
-        int b = 100;
-
-        for (int i = 0; i < b; i++) {
-
-            result *= a;
-
-        }
-
-        System.out.println(result);
+    public String testMethod(String name, int age) {
+        return "";
     }
 }

@@ -1,5 +1,6 @@
 package leetcode;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -12,7 +13,25 @@ import java.util.List;
 public class LeetCode_022 {
 
     public static List<String> generateParenthesis(int n) {
+        char[] chars = new char[n << 1];
+        List<String> ans = new ArrayList<String>();
+        generateParenthesisProcess(n, 0, 0, chars, 0, ans);
+        return ans;
+    }
 
-        return null;
+    private static void generateParenthesisProcess(int n, int left, int right, char[] chars, int index, List<String> list) {
+        if (left >= n) {
+            while (index < chars.length) {
+                chars[index++] = ')';
+            }
+            list.add(String.valueOf(chars));
+            return;
+        }
+        chars[index] = '(';
+        generateParenthesisProcess(n, left + 1, right, chars, index + 1, list);
+        if (right < left) {
+            chars[index] = ')';
+            generateParenthesisProcess(n, left, right + 1, chars, index + 1, list);
+        }
     }
 }

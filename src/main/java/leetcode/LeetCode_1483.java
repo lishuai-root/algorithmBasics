@@ -1,7 +1,8 @@
 package leetcode;
 
 import java.io.File;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 /**
@@ -23,31 +24,21 @@ public class LeetCode_1483 {
 
     public static void main(String[] args) throws Exception {
 //        int[][] ints = new int[50000][50000 / 2 + 1];
+        int[] parent = {-1, 0, 0, 1, 1, 2, 2};
+        int n = 7;
 //        int[] parent = {-1, 0, 0, 0, 3};
 //        int n = 5;
-//        TreeAncestor treeAncestor = new TreeAncestor(n, parent);
-//        System.out.println(treeAncestor.getKthAncestor(3, 1));
+        TreeAncestor treeAncestor = new TreeAncestor(n, parent);
+        System.out.println(treeAncestor.getKthAncestor(1, 5));
+        System.out.println(treeAncestor.getKthAncestor(0, 1));
+        System.out.println(treeAncestor.getKthAncestor(3, 1));
 //        System.out.println(treeAncestor.getKthAncestor(5, 2));
 //        System.out.println(treeAncestor.getKthAncestor(6, 3));
-//        System.out.println(treeAncestor.getKthAncestor(3, 1));
-//        System.out.println(treeAncestor.getKthAncestor(5, 2));
-//        System.out.println(treeAncestor.getKthAncestor(6, 3));
-//        System.out.println(treeAncestor.getKthAncestor(1, 5));
-//        System.out.println(treeAncestor.getKthAncestor(3, 2));
-//        System.out.println(treeAncestor.getKthAncestor(0, 1));
-//        System.out.println(treeAncestor.getKthAncestor(3, 1));
-//        System.out.println(treeAncestor.getKthAncestor(3, 5));
 
-//        test();
-//        int a = 1;
-//        while (a < 500000) {
-//            a <<= 1;
-//            System.out.println(a);
-//        }
-//
-//        System.out.println(524288 - 262144);
-
-        System.out.println(50000 / 32);
+        TreeAncestor_02 treeAncestor2 = new TreeAncestor_02(n, parent);
+        System.out.println(treeAncestor2.getKthAncestor(1, 5));
+        System.out.println(treeAncestor2.getKthAncestor(0, 1));
+        System.out.println(treeAncestor2.getKthAncestor(3, 1));
     }
 
     private static void test() throws Exception {
@@ -70,29 +61,136 @@ public class LeetCode_1483 {
 
 
     static class TreeAncestor {
-        private final int[] parent;
-        private final int[][] cache;
-        private final int MIN_SKIP = 32;
+
+        int[][] values;
+        int[] reIndex;
+
+        int[] offset;
+        int valueIndex;
+
 
         public TreeAncestor(int n, int[] parent) {
-            this.parent = parent;
-            this.cache = new int[n + 1][32];
-            for (int[] ints : cache) {
-                Arrays.fill(ints, -2);
+            List<Integer>[] cache = new List[n];
+            reIndex = new int[n];
+            int len = 0;
+            for (int i = 1; i < n; i++) {
+                if (cache[parent[i]] == null) {
+                    cache[parent[i]] = new ArrayList<>();
+                }
+                List<Integer> list = cache[parent[i]];
+                if (list.size() == 0) {
+                    len++;
+                }
+                list.add(i);
+            }
+            len = n - len;
+            values = new int[len][0];
+            valueIndex = 0;
+            int[] temp = new int[n];
+            int[] rvi = new int[len];
+            init(cache, 0, temp, temp.length, rvi);
+            offset = new int[n];
+            for (int i = 0; i < valueIndex; i++) {
+                updateReserveIndex(parent, rvi[i], rvi[i], 0, temp);
+            }
+        }
+
+        private void updateReserveIndex(int[] parent, int index, int base, int level, int[] temp) {
+            if (index == -1 || temp[index] == -1) {
+                return;
+            }
+            offset[index] = level;
+            reIndex[index] = reIndex[base];
+            temp[index] = -1;
+            updateReserveIndex(parent, parent[index], base, level + 1, temp);
+        }
+
+        private void init(List<Integer>[] cache, int index, int[] temp, int ti, int[] rvi) {
+            if (cache[index] == null) {
+                int len = temp.length - ti;
+                int[] val = new int[len];
+                System.arraycopy(temp, ti, val, 0, len);
+                values[valueIndex] = val;
+                reIndex[index] = valueIndex;
+                rvi[valueIndex++] = index;
+                return;
+            }
+            temp[ti - 1] = index;
+            List<Integer> list = cache[index];
+            for (int child : list) {
+                init(cache, child, temp, ti - 1, rvi);
             }
         }
 
         public int getKthAncestor(int node, int k) {
+            int index = reIndex[node];
+            int off = offset[node];
+            if (off + k > values[index].length) {
+                return -1;
+            }
+            return values[index][off + k - 1];
+        }
+    }
 
-            return 0;
+    static class TreeAncestor_02 {
+
+        int[][] values;
+
+        int[] reIndex;
+
+        int[] offset;
+
+        public TreeAncestor_02(int n, int[] parent) {
+            reIndex = new int[n];
+            offset = new int[n];
+            int[] t = new int[n];
+            int len = 0;
+            for (int i = 1; i < n; i++) {
+                if (t[parent[i]] == 0) {
+                    len++;
+                }
+                t[parent[i]]--;
+            }
+            len = n - len;
+            values = new int[len][0];
+            int[] temp = new int[n];
+            len = 0;
+            for (int i = 0; i < n; i++) {
+                if (t[i] == 0) {
+                    init(parent, temp, 0, len, i);
+                    len++;
+                }
+            }
         }
 
-        private int getMinIndex(int[] arr, int k) {
-            int index = 0;
-            while (index + 1 < arr.length && arr[index + 1] <= k) {
-
+        private void init(int[] parent, int[] temp, int index, int base, int cur) {
+            if (cur == -1) {
+                int[] nums = new int[index];
+                System.arraycopy(temp, 0, nums, 0, index);
+                values[base] = nums;
+                return;
             }
-            return index;
+            if (offset[cur] > 0) {
+                int ol = values[reIndex[cur]].length - offset[cur];
+                int[] nums = new int[index + ol];
+                System.arraycopy(temp, 0, nums, 0, index);
+                System.arraycopy(values[reIndex[cur]], offset[cur], nums, index, ol);
+                values[base] = nums;
+                return;
+            }
+            offset[cur] = index;
+            reIndex[cur] = base;
+            temp[index] = cur;
+            init(parent, temp, index + 1, base, parent[cur]);
+        }
+
+        public int getKthAncestor(int node, int k) {
+            int index = reIndex[node];
+            int off = offset[node];
+            if (off + k >= values[index].length) {
+                return -1;
+            }
+            return values[index][off + k];
         }
     }
 }

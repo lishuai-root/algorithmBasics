@@ -1,6 +1,7 @@
 package leetcode;
 
-import java.util.Arrays;
+import java.util.Collections;
+import java.util.PriorityQueue;
 
 /**
  * @description: You are given an array nums of n positive integers.
@@ -32,159 +33,32 @@ public class LeetCode_1675 {
 
     }
 
-    public static int minimumDeviation_03(int[] nums) {
-        Arrays.sort(nums);
-        int ans = nums[nums.length - 1] - nums[0], pre = ans;
-
-        while (true) {
-
-//            for (int i = 0; i < nums.length; i++) {
-//
-//                if ((nums[i] & 1) == 1) {
-//                    nums[i] <<= 1;
-//                } else {
-//                    nums[i] >>>= 1;
-//                }
-//            }
-
-            if ((nums[0] & 1) == 1) {
-                nums[0] <<= 1;
-            }
-            if ((nums[nums.length - 1] & 1) == 0) {
-                nums[nums.length - 1] >>>= 1;
-            }
-            Arrays.sort(nums);
-            pre = Math.max(pre, nums[nums.length - 1] - nums[0]);
-            if (pre > ans) {
-                break;
-            }
-            ans = pre;
-        }
-
-        return ans;
-    }
 
     public static int minimumDeviation(int[] nums) {
-
-        Arrays.sort(nums);
-        int min = 0, max = nums.length - 1, ans = nums[max] - nums[min], pre = ans, n = nums.length;
-
-        while (((nums[min] & 1) == 1 || (nums[max] & 1) == 0) && n > 0) {
-            n -= 2;
-            int left = nums[min], right = nums[max], curMin = Integer.MAX_VALUE, curMax = Integer.MAX_VALUE, curAns = Integer.MAX_VALUE;
-            if ((nums[min] & 1) == 1 && (nums[min] << 1) >= left) {
-                nums[min] <<= 1;
-                curMin = Math.max(right, nums[min]) - Math.min(nums[min], nums[min + 1]);
-                if (curMin < pre) {
-                    pre = curMin;
-                }
-//                pre = Math.min(pre, Math.max(right, nums[min]) - Math.min(nums[min], nums[min + 1]));
+        PriorityQueue<Integer> pq = new PriorityQueue<>(Collections.reverseOrder());
+        int minValue = Integer.MAX_VALUE;
+        for (int x : nums) {
+            if ((x & 1) == 1) {
+                x <<= 1;
             }
-
-
-            if ((nums[max] & 1) == 0 && (nums[max] >>> 1) <= right) {
-                nums[max] >>>= 1;
-                curMax = Math.max(nums[max], nums[max - 1]) - Math.min(left, nums[max]);
-                if (curMax < pre) {
-                    pre = curMax;
-                }
-//                pre = Math.min(pre, Math.max(nums[max], nums[max - 1]) - Math.min(left, nums[max]));
-            }
-
-
-//            while (min < nums.length - 1 && nums[min] > nums[min + 1]) {
-//                nums[min] = nums[min] ^ nums[min + 1];
-//                nums[min + 1] = nums[min] ^ nums[min + 1];
-//                nums[min] = nums[min] ^ nums[min + 1];
-//                min++;
-//            }
-//
-//            while (max > 0 && nums[max] < nums[max - 1]) {
-//                nums[max] = nums[max] ^ nums[max - 1];
-//                nums[max - 1] = nums[max] ^ nums[max - 1];
-//                nums[max] = nums[max] ^ nums[max - 1];
-//                max--;
-//            }
-
-
-            left = Integer.MAX_VALUE;
-            right = Integer.MIN_VALUE;
-            for (int i : nums) {
-                left = Math.min(left, i);
-                right = Math.max(right, i);
-            }
-
-//            curAns = Math.min(pre, nums[nums.length - 1] - nums[0]);
-            curAns = right - left;
-            if (curAns <= Math.min(curMin, curMax)) {
-                pre = curAns;
-            } else if (curMin < curMax) {
-                pre = curMin;
-                if (curMax != Integer.MAX_VALUE) {
-                    nums[max] <<= 1;
-                }
-            } else {
-                pre = curMax;
-                if (curMin != Integer.MAX_VALUE) {
-                    nums[min] >>>= 1;
-                }
-            }
-            Arrays.sort(nums);
-            min = 0;
-            max = nums.length - 1;
-//            for (int i : nums) {
-//                System.out.print(i + " ");
-//            }
-//            System.out.println();
-//            System.out.println(pre);
-            if (pre > ans) {
+            pq.add(x);
+            minValue = Math.min(minValue, x);
+        }
+        int minDeviation = Integer.MAX_VALUE;
+        while (!pq.isEmpty()) {
+            int curr = pq.poll();
+            minDeviation = Math.min(minDeviation, curr - minValue);
+            if ((curr & 1) == 1) {
                 break;
             }
-
-            ans = pre;
+            curr >>= 1;
+            minValue = Math.min(minValue, curr);
+            pq.add(curr);
         }
-
-        return ans;
+        return minDeviation;
     }
 
-    public static int minimumDeviation_02(int[] nums) {
 
-        Arrays.sort(nums);
-        return process(nums, nums[nums.length - 1] - nums[0], nums.length / 2);
-    }
-
-    private static int process(int[] nums, int min, int row) {
-
-        if (row == 0) {
-            return min;
-        }
-        Arrays.sort(nums);
-        int ans = nums[nums.length - 1] - nums[0];
-        int[] cur;
-//        System.out.println("ans : " + ans);
-        if ((nums[0] & 1) == 1 && (nums[nums.length - 1] & 1) == 0) {
-            cur = Arrays.copyOf(nums, nums.length);
-            cur[0] <<= 1;
-            cur[cur.length - 1] >>>= 1;
-            ans = Math.min(ans, process(cur, ans, row - 1));
-            cur[0] >>>= 1;
-            cur[cur.length - 1] <<= 1;
-        }
-        if ((nums[0] & 1) == 1) {
-            cur = Arrays.copyOf(nums, nums.length);
-            cur[0] <<= 1;
-            ans = Math.min(ans, process(cur, ans, row - 1));
-            cur[0] >>>= 1;
-        }
-
-        if ((nums[nums.length - 1] & 1) == 0) {
-            cur = Arrays.copyOf(nums, nums.length);
-            cur[cur.length - 1] >>>= 1;
-            ans = Math.min(ans, process(cur, ans, row - 1));
-            cur[cur.length - 1] <<= 1;
-        }
-        return ans;
-    }
 }
 
 
