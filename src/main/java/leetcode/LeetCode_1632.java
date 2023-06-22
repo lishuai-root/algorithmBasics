@@ -53,67 +53,141 @@ public class LeetCode_1632 {
     }
 
     public static int[][] matrixRankTransform(int[][] matrix) {
-        int rowLen = matrix.length, colLen = matrix[0].length;
-        int[][] ans = new int[rowLen][colLen];
-        int[] rowMax = new int[rowLen];
-        int[] colMax = new int[colLen];
-        List<Map<Integer, Integer>> rowList = new ArrayList<>();
-        List<Map<Integer, Integer>> colList = new ArrayList<>();
-        Queue<int[]> queue = new PriorityQueue<>((a, b) -> {
-            return matrix[a[0]][a[1]] - matrix[b[0]][b[1]];
-        });
-
-        for (int i = 0; i < rowLen; i++) {
-            rowList.add(new HashMap<>());
-            for (int j = 0; j < colLen; j++) {
+        int rLen = matrix.length, cLen = matrix[rLen - 1].length;
+        int[][] ans = new int[rLen][cLen];
+        Info[][] temp = new Info[rLen][cLen];
+        int[] rt = new int[rLen];
+        int[] ct = new int[cLen];
+        Info[] ri = new Info[rLen];
+        Info[] ci = new Info[cLen];
+        Queue<int[]> queue = new PriorityQueue<>((a, b) -> matrix[a[0]][a[1]] - matrix[b[0]][b[1]]);
+        for (int i = 0; i < rLen; i++) {
+            for (int j = 0; j < cLen; j++) {
                 queue.offer(new int[]{i, j});
-                if (colList.size() <= j) {
-                    colList.add(new HashMap<>());
-                }
             }
         }
         while (!queue.isEmpty()) {
-            int[] cur = queue.poll();
-            int r = cur[0];
-            int c = cur[1];
-            int p = Math.max(ans[r][rowMax[r]], ans[colMax[c]][c]);
-            if (p == 0) {
-                ans[r][c] = 1;
+            int[] curs = queue.poll();
+            int r, c;
+            Info ttrr = temp[curs[0]][rt[curs[0]]];
+            Info ttcc = temp[ct[curs[1]]][curs[1]];
+            if (ttrr == ttcc || ttcc == null || (ttrr != null && ttrr.value > ttcc.value)) {
+                r = curs[0];
+                c = rt[curs[0]];
             } else {
-                if (ans[r][rowMax[r]] >= ans[colMax[c]][c]) {
-                    if (matrix[r][c] == matrix[r][rowMax[r]]) {
-                        ans[r][c] = ans[r][rowMax[r]];
-                    } else {
-                        ans[r][c] = ans[r][rowMax[r]] + 1;
-                    }
-
-                } else {
-                    if (matrix[r][c] == matrix[colMax[c]][c]) {
-                        ans[r][c] = ans[colMax[c]][c];
-                    } else {
-                        ans[r][c] = ans[colMax[c]][c] + 1;
-                    }
+                r = ct[curs[1]];
+                c = curs[1];
+            }
+//            if (temp[curs[0]][rt[curs[0]]] > temp[ct[curs[1]]][curs[1]]) {
+//                r = curs[0];
+//                c = rt[curs[0]];
+//            } else {
+//                r = ct[curs[1]];
+//                c = curs[1];
+//            }
+            Info info = temp[r][c];
+            if (matrix[curs[0]][curs[1]] == matrix[r][c]) {
+                if (info == null) {
+                    info = new Info(1);
+                    temp[r][c] = info;
                 }
+                temp[curs[0]][curs[1]] = info;
+            } else {
+                if (info == null) {
+                    info = new Info(1);
+                } else {
+                    info = new Info(info.value + 1);
+                }
+                temp[curs[0]][curs[1]] = info;
             }
-
-            rowMax[r] = c;
-            colMax[c] = r;
+//            ans[curs[0]][curs[1]] = (matrix[curs[0]][curs[1]] == matrix[r][c] ? Math.max(1, ans[r][c]) : Math.max(1, ans[r][c] + 1));
+            rt[curs[0]] = curs[1];
+            ct[curs[1]] = curs[0];
+            ri[curs[0]] = info;
+            ci[curs[1]] = info;
         }
-
-        for (int i = 0; i < rowLen; i++) {
-            for (int j = 0; j < colLen; j++) {
-                int p = Math.max(ans[i][j], Math.max(rowList.get(i).getOrDefault(matrix[i][j], 0),
-                        colList.get(j).getOrDefault(matrix[i][j], 0)));
-                rowList.get(i).put(matrix[i][j], p);
-                colList.get(j).put(matrix[i][j], p);
-            }
-        }
-
-        for (int i = 0; i < rowLen; i++) {
-            for (int j = 0; j < colLen; j++) {
-                ans[i][j] = Math.max(rowList.get(i).get(matrix[i][j]), colList.get(j).get(matrix[i][j]));
+        for (int i = 0; i < rLen; i++) {
+            for (int j = 0; j < cLen; j++) {
+                ans[i][j] = temp[i][j].value;
             }
         }
         return ans;
+    }
+
+    public int[][] matrixRankTransform_other(int[][] m) {
+        int M = m.length, N = m[0].length;
+        int[][] a = new int[M][N];
+        int[] maxRankRow = new int[M];
+        int[] maxRankCol = new int[N];
+        TreeMap<Integer, List<int[]>> map = new TreeMap<>();
+        for (int i = 0; i < M; i++) {
+            for (int j = 0; j < N; j++) {
+                map.putIfAbsent(m[i][j], new ArrayList<>());
+                map.get(m[i][j]).add(new int[]{i, j});
+            }
+        }
+
+        // go from the lowest value key to the highest
+        for (int k : map.keySet()) {
+            // repeat for each value until we used all cells with the same number
+            // on each step we find cells connected by row/column and calculate their rank
+            while (map.get(k).size() > 0) {
+                Set<Integer> rowsUsed = new HashSet<>();
+                Set<Integer> colsUsed = new HashSet<>();
+                List<int[]> allSame = map.get(k);
+
+                // get the first cell as the root and find all connected cells
+                int[] root = allSame.get(0);
+                rowsUsed.add(root[0]);
+                colsUsed.add(root[1]);
+                boolean[] used = new boolean[allSame.size()];
+                used[0] = true;
+                // continue until we found all connected
+                while (true) {
+                    int added = 0;
+                    for (int i = 1; i < allSame.size(); i++) {
+                        int[] n = allSame.get(i);
+                        if (used[i]) continue;
+                        // if the cell is in the same row or column with the root or any one that is already connected with the root
+                        if (rowsUsed.contains(n[0]) || colsUsed.contains(n[1])) {
+                            rowsUsed.add(n[0]);
+                            colsUsed.add(n[1]);
+                            used[i] = true;
+                            added++;
+                        }
+                    }
+                    if (added == 0) break;
+                }
+                List<int[]> connected = new ArrayList<>();
+                List<int[]> left = new ArrayList<>();
+                for (int i = 0; i < allSame.size(); i++) {
+                    if (used[i]) connected.add(allSame.get(i));
+                    else left.add(allSame.get(i));
+                }
+                // put all that are not connected back to the map
+                map.put(k, left);
+
+                int rank = Integer.MIN_VALUE;
+
+                // calculate the maximum rank of all connected cells
+                for (int[] n : connected) {
+                    rank = Math.max(rank, Math.max(maxRankRow[n[0]], maxRankCol[n[1]]) + 1);
+                }
+                // update maxRank for all cols and rows and set the rank as answer for each connected cell
+                for (int[] n : connected) {
+                    maxRankRow[n[0]] = maxRankCol[n[1]] = rank;
+                    a[n[0]][n[1]] = rank;
+                }
+            }
+        }
+        return a;
+    }
+
+    static class Info {
+        int value;
+
+        public Info(int value) {
+            this.value = value;
+        }
     }
 }

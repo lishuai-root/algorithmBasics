@@ -65,7 +65,7 @@ public class LeetCode_745 {
                 return true;
             }
 
-            if (root == null) {
+            if (root == null || root.pre == null) {
                 return false;
             }
 
