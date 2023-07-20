@@ -22,4 +22,6 @@ public abstract class Parent {
         System.out.println("parent do check!");
     }
 
+    abstract Object testChildMethod(Object o);
+
 }

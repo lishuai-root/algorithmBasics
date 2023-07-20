@@ -1,6 +1,6 @@
 package test;
 
-import java.lang.reflect.Constructor;
+import java.util.Map;
 
 /**
  * @description:
@@ -12,9 +12,7 @@ import java.lang.reflect.Constructor;
 public class Test_009 {
 
     public static void main(String[] args) {
-        Constructor<?>[] declaredConstructors = TreeText.class.getDeclaredConstructors();
-        for (Constructor constructor : declaredConstructors) {
-            System.out.println(constructor.isSynthetic() + " - " + constructor.getParameterCount());
-        }
+        Map<String, String> map = (Map<String, String>) null;
+        System.out.println(map);
     }
 }

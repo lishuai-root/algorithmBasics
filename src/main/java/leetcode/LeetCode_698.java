@@ -1,5 +1,7 @@
 package leetcode;
 
+import java.util.Arrays;
+
 /**
  * @description: Given an integer array nums and an integer k,
  * return true if it is possible to divide this array into k non-empty subsets whose sums are all equal.
@@ -26,8 +28,12 @@ public class LeetCode_698 {
 
 //        int[] nums = {2, 2, 2, 2, 3, 4, 5};
 //        int k = 4;
-        int[] nums = {4, 3, 2, 3, 5, 2, 1};
-        int k = 4;
+//        int[] nums = {4, 3, 2, 3, 5, 2, 1};
+//        int k = 4;
+//        int[] nums = {3, 3, 10, 2, 6, 5, 10, 6, 8, 3, 2, 1, 6, 10, 7, 2};
+//        int k = 6;
+        int[] nums = {7628, 3147, 7137, 2578, 7742, 2746, 4264, 7704, 9532, 9679, 8963, 3223, 2133, 7792, 5911, 3979};
+        int k = 6;
         boolean b = canPartitionKSubsets(nums, k);
         System.out.println(b);
         System.out.println(canPartitionKSubsets_dp(nums, k));
@@ -38,33 +44,80 @@ public class LeetCode_698 {
             return false;
         }
         int[] arr = new int[k];
-        long sum = 0;
+        int sum = 0;
         for (int i : nums) {
             sum += i;
         }
         if (sum % k != 0) {
             return false;
         }
-        return canPartitionKSubsetsProcess(nums, arr, (int) (sum / k), 0);
+        Arrays.sort(nums);
+//        return canPartitionKSubsetsProcess(nums, arr, (int) (sum / k), 0, 0);
+        return f(nums, sum / k) == k;
     }
 
-    private static boolean canPartitionKSubsetsProcess(int[] nums, int[] arr, int mid, int index) {
+    private static int f(int[] nums, int mid) {
+        Integer[][] dp = new Integer[nums.length][mid];
+        return canPartitionKSubsetsProcess(nums, mid, 0, 0, dp);
+    }
+
+
+    private static int canPartitionKSubsetsProcess(int[] nums, int mid, int sum, int index, Integer[][] dp) {
+        if (sum == mid) {
+            return 1 + f(nums, mid);
+        }
+        if (index >= nums.length || sum > mid || sum + nums[index] > mid) {
+            return 0;
+        }
+        if (dp[index][sum] != null) {
+            return dp[index][sum];
+        }
+
+        int p1 = canPartitionKSubsetsProcess(nums, mid, sum, index + 1, dp);
+
+        int k = nums[index];
+        nums[index] = 0;
+        int p2 = canPartitionKSubsetsProcess(nums, mid, sum + k, index + 1, dp);
+        nums[index] = k;
+        dp[index][sum] = Math.max(p1, p2);
+        return dp[index][sum];
+    }
+
+
+    private static boolean canPartitionKSubsetsProcess(int[] nums, int[] arr, int mid, int index, int k) {
         if (index >= nums.length) {
             return true;
         }
-
-        boolean ans = false;
-        for (int i = 0; i < arr.length && !ans; i++) {
-            if (arr[i] + nums[index] <= mid) {
-                arr[i] += nums[index];
-                ans = canPartitionKSubsetsProcess(nums, arr, mid, index + 1);
-                arr[i] -= nums[index];
+        for (int i : arr) {
+            if (mid != i && mid - i < nums[index]) {
+                return false;
             }
         }
+        boolean ans = false;
+        int len = arr.length, p = (k + 1) % len;
+        while (!ans) {
+            if (arr[p] + nums[index] <= mid) {
+                arr[p] += nums[index];
+                ans = canPartitionKSubsetsProcess(nums, arr, mid, index + 1, p);
+                arr[p] -= nums[index];
+            }
+            if (p == k) {
+                break;
+            }
+            p = (++p) % len;
+        }
+
+//        for (int i = 0; i < arr.length && !ans; i++) {
+//            if (arr[i] + nums[index] <= mid) {
+//                arr[i] += nums[index];
+//                ans = canPartitionKSubsetsProcess(nums, arr, mid, index + 1, i);
+//                arr[i] -= nums[index];
+//            }
+//        }
         return ans;
     }
 
-    private static boolean canPartitionKSubsetsProcess(int[] nums, int[] arr, int mid, int index, int m) {
+    private static boolean canPartitionKSubsetsProcess_02(int[] nums, int[] arr, int mid, int index, int m) {
         if (index >= nums.length) {
             return true;
         }
@@ -120,12 +173,12 @@ public class LeetCode_698 {
                 bls[i][j] = ans;
             }
         }
-        for (boolean[] bs : bls) {
-            for (boolean b : bs) {
-                System.out.print(b + " ");
-            }
-            System.out.println();
-        }
+//        for (boolean[] bs : bls) {
+//            for (boolean b : bs) {
+//                System.out.print(b + " ");
+//            }
+//            System.out.println();
+//        }
         return bls[0][0];
     }
 }

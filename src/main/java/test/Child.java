@@ -7,7 +7,7 @@ package test;
  * @version: 1.0
  */
 
-public class Child extends Parent {
+public class Child<T> extends Parent {
 
     public void check() {
 
@@ -23,5 +23,14 @@ public class Child extends Parent {
     protected void doCheck() {
         childMethod();
         System.out.println("child do check!");
+    }
+
+
+    @Override
+    String testChildMethod(Object o) {
+        return "aaa";
+    }
+
+    public void testShow(T t, String s) {
     }
 }

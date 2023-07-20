@@ -7,6 +7,7 @@ import java.io.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
 
 /**
@@ -22,7 +23,18 @@ public class Test_001 extends ClassLoader {
     private static Test_001 test = new Test_001();
 
     public static void main(String[] args) throws InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
-        fn_002();
+//        fn_002();
+        String line = "阿a拉贡哈房间看电视安德森快乐到家啊了反对撒赖科技经费和拉大风蓝色咖啡和埃里克还是狄拉克符号爱丽丝反对黄金大神了和拉伸领导看附件half的会计师啊";
+        long start = System.currentTimeMillis();
+        for (int i = 0; i < 4000000; i++) {
+            byte[] bytes = line.getBytes(StandardCharsets.UTF_8);
+            String s = new String(bytes, 0, 5, StandardCharsets.UTF_8);
+            if (s.getBytes(StandardCharsets.UTF_8).length > 5) {
+                s = s.substring(0, s.length() - 1);
+            }
+        }
+        long end = System.currentTimeMillis();
+        System.out.println("time : " + (end - start));
     }
 
     private static void fn_001() {
@@ -35,7 +47,8 @@ public class Test_001 extends ClassLoader {
         }
     }
 
-    private static void fn_002() throws InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
+    private static void fn_002() throws
+            InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
 
         File file = new File("E:\\All_workspace\\IDEA_workspace\\algorithmBasics\\target\\classes\\leetcode");
 
@@ -71,7 +84,8 @@ public class Test_001 extends ClassLoader {
         }
     }
 
-    private static Class<?> getClassObject(String className) throws InvocationTargetException, InstantiationException, IllegalAccessException {
+    private static Class<?> getClassObject(String className) throws
+            InvocationTargetException, InstantiationException, IllegalAccessException {
 
         return test.findLoadedClass(className);
     }
