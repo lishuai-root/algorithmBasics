@@ -39,11 +39,34 @@ public class LeetCode_2045 {
 //        int n = 2, time = 2, change = 1;
 //        int[][] edges = {{1, 2}, {1, 3}, {2, 4}, {3, 5}, {5, 4}, {4, 6}};
 //        int n = 6, time = 3, change = 2;
-        int n = 8541, time = 861, change = 272;
-        int[][] edges = getArrays(n);
-        System.out.println("edges size : " + edges.length);
-        int i = secondMinimum(n, edges, time, change);
-        System.out.println(i);
+//        int n = 8541, time = 861, change = 272;
+//        int[][] edges = getArrays(n);
+        int n = 806, time = 512, change = 407;
+        int[][] edges = getArrays();
+//        int n = 9055, time = 792, change = 172;
+//        int[][] edges = getArrays();
+//        System.out.println("edges size : " + edges.length);
+//        int i = secondMinimum(n, edges, time, change);
+//        System.out.println(i);
+
+        System.out.println(secondMinimum_20230820(n, edges, time, change));
+        System.out.println(n >> 4);
+    }
+
+    private static int[][] getArrays() throws FileNotFoundException {
+        File file = new File("C:\\Users\\是李帅啊\\Desktop\\test.txt");
+//        File file = new File("C:\\Users\\是李帅啊\\Desktop\\test2.txt");
+        Scanner scanner = new Scanner(file);
+        String line = scanner.nextLine();
+        String[] split = line.split("&");
+        int[][] arr = new int[split.length][2];
+        for (int i = 0; i < split.length; i++) {
+            String s = split[i];
+            String[] split1 = s.split(",");
+            arr[i][0] = Integer.parseInt(split1[0]);
+            arr[i][1] = Integer.parseInt(split1[1]);
+        }
+        return arr;
     }
 
     private static int[][] getArrays(int n) throws FileNotFoundException {
@@ -232,6 +255,59 @@ public class LeetCode_2045 {
         return graph;
     }
 
+    public static int secondMinimum_20230820(int n, int[][] edges, int time, int change) {
+        List<List<Integer>> graph = new ArrayList<>(n + 1);
+        for (int i = 0; i <= n; i++) {
+            graph.add(new ArrayList<>());
+        }
+        for (int[] edge : edges) {
+            graph.get(edge[0]).add(edge[1]);
+            graph.get(edge[1]).add(edge[0]);
+        }
+        Queue<int[]> queue = new PriorityQueue<>((a, b) -> a[1] - b[1]);
+        int[] count = new int[n + 1];
+        ++count[1];
+        queue.offer(new int[]{1, 0, change});
+        int ans = Integer.MAX_VALUE, k = 10;
+        while (!queue.isEmpty()) {
+            int[] curs = queue.poll();
+            if (curs[0] == n) {
+                if (ans == Integer.MAX_VALUE) {
+                    Arrays.fill(count, 0);
+                    k = 1;
+                    ans = curs[1];
+                } else if (ans < curs[1]) {
+                    return curs[1];
+                }
+            }
+            for (int next : graph.get(curs[0])) {
+                if (count[next] == k) {
+                    continue;
+                }
+                ++count[next];
+                if (curs[2] >= time) {
+                    queue.offer(new int[]{next, curs[1] + time, curs[2] - time});
+                    continue;
+                }
+                int p, q, c;
+                if (curs[2] <= 0) {
+                    p = time / change;
+                    c = (p + 1) * change - time;
+                    int w = curs[2] == 0 ? change : -curs[2];
+                    q = curs[1] + time + w;
+                    c = (p & 1) == 0 ? c : -c;
+                } else {
+                    int tailTime = time - curs[2];
+                    p = tailTime / change;
+                    c = (p + 1) * change - tailTime;
+                    q = curs[1] + time;
+                    c = (p & 1) == 1 ? c : -c;
+                }
+                queue.offer(new int[]{next, q, c});
+            }
+        }
+        return -1;
+    }
 
     static class UF {
         int[] uf;
